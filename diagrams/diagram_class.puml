@@ -19,9 +19,9 @@ class Bus{
         int page
         int per_page
         String sort_by
-        String sort_text
+        String sort
         String filter_by
-        String filter_text
+        String filter
         int more_than_percentage_of_capacity_sold
     )
 }
@@ -46,9 +46,9 @@ class Driver{
         int page
         int per_page
         String sort_by
-        String sort_text
+        String sort
         String filter_by
-        String filter_text
+        String filter
     )
 }
 Driver::bus_id <-- Bus::id
@@ -70,9 +70,9 @@ class Passenger{
         int page
         int per_page
         String sort_by
-        String sort_text
+        String sort
         String filter_by
-        String filter_text
+        String filter
     )
 }
 
@@ -91,9 +91,9 @@ class Location{
         int page
         int per_page
         String sort_by
-        String sort_text
+        String sort
         String filter_by
-        String filter_text
+        String filter
     )
 }
 class Journey{
@@ -113,9 +113,9 @@ class Journey{
         int page
         int per_page
         String sort_by
-        String sort_text
+        String sort
         String filter_by
-        String filter_text
+        String filter
     )
 }
 Journey::location_id_origin <-- Location::id
@@ -139,9 +139,9 @@ class JourneyDriver{
         int page
         int per_page
         String sort_by
-        String sort_text
+        String sort
         String filter_by
-        String filter_text
+        String filter
     )
 }
 JourneyDriver::journey_id <-- Journey::id
@@ -162,9 +162,9 @@ class Seat{
         int page
         int per_page
         String sort_by
-        String sort_text
+        String sort
         String filter_by
-        String filter_text
+        String filter
     )
 }
 
@@ -186,9 +186,9 @@ class Ticket{
         int page
         int per_page
         String sort_by
-        String sort_text
+        String sort
         String filter_by
-        String filter_text
+        String filter
     )
 }
 Ticket::passenger_id <-- Passenger::id
