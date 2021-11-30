@@ -1,9 +1,9 @@
-Create Project
+## Environment development
     
     S.O.: Linux Ubuntu 20.04
     Python version: 3.8.10
 
-## command code
+## Command run project
     virtualenv -p python3 env
     . env/bin/activate
 
@@ -13,6 +13,6 @@ Create Project
     python3 manage.py migrate
     python3 manage.py runserver
 
-## Estructura de la base de datos
+## Database structure
 
 ![Diagram class](/diagrams/diagram_class.svg)
