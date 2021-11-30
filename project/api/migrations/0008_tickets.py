@@ -10,4 +10,37 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.CreateModel(
+            name='Ticket',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+
+                ('states', models.PositiveSmallIntegerField()),
+
+                (
+                    'passenger_id',
+                    models.ForeignKey(
+                        on_delete=models.deletion.DO_NOTHING,
+                        to='api.Passenger',
+                    ),
+                ),
+                (
+                    'journey_driver_id',
+                    models.ForeignKey(
+                        on_delete=models.deletion.DO_NOTHING,
+                        to='api.JourneyDriver',
+                    ),
+                ),
+                (
+                    'seat_id',
+                    models.ForeignKey(
+                        on_delete=models.deletion.DO_NOTHING,
+                        to='api.Seat',
+                    ),
+                ),
+                
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(null=True)),
+            ],
+        ),
     ]

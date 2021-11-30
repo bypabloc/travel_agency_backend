@@ -5,6 +5,7 @@ class Bus{
     -{field} id : BigInteger << pk, generated, unique >>
     +{field} plate : String << unique >>
     +{field} color : String
+    +{field} brand : String
     +{field} model : String
     +{field} serial : String << unique >>
     +{field} year : Date
