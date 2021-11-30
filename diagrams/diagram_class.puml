@@ -15,7 +15,10 @@ class Bus{
     __
 
     +{method} create()
-    +{method} state_change()
+    +{method} findOne(
+        int id
+    )
+    +{method} state_change(
     +{method} list(
         int page
         int per_page
@@ -43,6 +46,9 @@ class Driver{
     +{method} create()
     +{method} update()
     +{method} state_change()
+    +{method} findOne(
+        int id
+    )
     +{method} list(
         int page
         int per_page
@@ -67,6 +73,9 @@ class Passenger{
 
     +{method} create()
     +{method} whitelist_change()
+    +{method} findOne(
+        int id
+    )
     +{method} list(
         int page
         int per_page
@@ -88,6 +97,9 @@ class Location{
     +{method} create()
     +{method} update()
     +{method} state_change()
+    +{method} findOne(
+        int id
+    )
     +{method} list(
         int page
         int per_page
@@ -110,6 +122,9 @@ class Journey{
 
     +{method} create()
     +{method} state_change()
+    +{method} findOne(
+        int id
+    )
     +{method} list(
         int page
         int per_page
@@ -136,6 +151,9 @@ class JourneyDriver{
     +{method} create()
     +{method} driver_change()
     +{method} state_change()
+    +{method} findOne(
+        int id
+    )
     +{method} list(
         int page
         int per_page
@@ -159,6 +177,9 @@ class Seat{
 
     +{method} create()
     +{method} state_change()
+    +{method} findOne(
+        int id
+    )
     +{method} list(
         int page
         int per_page
@@ -183,6 +204,9 @@ class Ticket{
     +{method} create()
     +{method} seat_change()
     +{method} state_change()
+    +{method} findOne(
+        int id
+    )
     +{method} list(
         int page
         int per_page
