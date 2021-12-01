@@ -1,5 +1,5 @@
 from django.urls import path
-from ..controllers.bus import list, findOne, create, state_change
+from ..controllers.BusController import list, findOne, create, state_change
 
 urlpatterns = [
     path('list', list, name='list'),
