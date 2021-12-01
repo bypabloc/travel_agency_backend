@@ -1,4 +1,5 @@
 from django.db import migrations, models
+from ..helpers.date_time_without_tz_field import DateTimeWithoutTZField
 
 class Migration(migrations.Migration):
 
@@ -15,7 +16,7 @@ class Migration(migrations.Migration):
                 ('document', models.CharField(max_length=15, unique=True)),
                 ('names', models.CharField(max_length=50)),
                 ('lastname', models.CharField(max_length=50)),
-                ('date_of_birth', models.DateTimeField()),
+                ('date_of_birth', DateTimeWithoutTZField()),
                 ('is_active', models.BooleanField(default=True)),
 
                 (
@@ -26,8 +27,8 @@ class Migration(migrations.Migration):
                     ),
                 ),
 
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(null=True)),
+                ('created_at', DateTimeWithoutTZField(auto_now_add=True)),
+                ('updated_at', DateTimeWithoutTZField(null=True)),
             ],
         ),
     ]

@@ -9,6 +9,8 @@ def model_apply_pagination(query, params):
 
     records_filtered = list.count()
 
+    print('query',list.all().query)
+
     return {
         'page': offset,
         'current_page': offset,
