@@ -16,5 +16,5 @@ def model_apply_pagination(query, params):
         'last_page': math.ceil(records_filtered / limit),
         'next_page': offset + 1 if (offset < records_filtered / limit) else None,
         'prev_page': offset - 1 if (offset > 1) else None,
-        'list': list,
+        'list': list.all().values(),
     }

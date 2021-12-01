@@ -7,7 +7,7 @@ class Bus(models.Model):
     brand = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     serial = models.CharField(max_length=100, unique=True)
-    year = models.DateTimeField()
+    year = models.DateField()
     is_active = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(default=now)
@@ -16,6 +16,3 @@ class Bus(models.Model):
     # class Meta:
         # managed = False
         # db_table = "uasdser"
-
-    def __str__(self):
-        return self.name
