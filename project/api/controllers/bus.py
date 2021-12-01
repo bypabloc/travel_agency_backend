@@ -8,28 +8,11 @@ from ..helpers.model_apply_sort import model_apply_sort
 from ..helpers.model_apply_filter import model_apply_filter
 from ..helpers.model_apply_pagination import model_apply_pagination
 from ..models import Bus
-from ..validations.BusValidation import BusCreateForm
+from ..repository.BusRepository import BusCreateForm, BusFindOneForm, BusStateChangeForm
 
 @api_view(['GET'])
 @csrf_exempt
 def list(request):
-    # List all buses
-    # if request.method == 'GET':
-    #     # Get all buses
-    #     buses = Bus.objects.all()
-
-    #     # Apply filters
-    #     buses = model_apply_filter(request, buses)
-
-    #     # Apply pagination
-    #     buses = model_apply_pagination(request, buses)
-
-    #     # Apply sort
-    #     buses = model_apply_sort(request, buses)
-
-    #     # Serialize and return
-    #     return Response(Bus.objects.all().values())
-
     data = {}
     try:
         params = paginate_queryset(request)
@@ -68,7 +51,19 @@ def list(request):
 @csrf_exempt
 def findOne(request):
 
-    return Response({}, status=status.HTTP_200_OK)
+    bus = BusFindOneForm(paginate_queryset(request))
+
+    if bus.is_valid():
+        bus = bus.find()
+        data = {
+            'data': bus,
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    else:
+        data = {
+            'errors': bus.getErrors(),
+        }
+        return Response(data, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 @api_view(['POST'])
 @csrf_exempt
@@ -92,4 +87,16 @@ def create(request):
 @csrf_exempt
 def state_change(request):
     
-    return Response({}, status=status.HTTP_201_CREATED)
+    bus = BusStateChangeForm(request.POST)
+
+    if bus.is_valid():
+        bus.save()
+        data = {
+            'data': bus.cleaned_data,
+        }
+        return Response(data, status=status.HTTP_201_CREATED)
+    else:
+        data = {
+            'errors': bus.getErrors(),
+        }
+        return Response(data, status=status.HTTP_422_UNPROCESSABLE_ENTITY)

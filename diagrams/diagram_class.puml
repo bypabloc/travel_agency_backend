@@ -18,7 +18,7 @@ class Bus{
     +{method} findOne(
         int id
     )
-    +{method} state_change(
+    +{method} state_change()
     +{method} list(
         int page
         int per_page
