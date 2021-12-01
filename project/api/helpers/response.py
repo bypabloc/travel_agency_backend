@@ -16,14 +16,16 @@ def sendCreated(data = {}, message = []):
             'data': data,
             'message': message,
         }, status=status.HTTP_201_CREATED)
-    except Exception as ex: lambda ex : sendInternalServerError(ex)
+    except Exception as ex:
+        return sendInternalServerError(ex)
 
 def sendUnprocessableEntity(errors = []):
     try:
         return Response({
             'errors': errors,
         }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-    except Exception as ex: lambda ex : sendInternalServerError(ex)
+    except Exception as ex:
+        return sendInternalServerError(ex)
 
 def sendInternalServerError(ex):
     print('sendInternalServerError -> ex',ex)
