@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
                 ('document', models.CharField(max_length=15, unique=True)),
                 ('names', models.CharField(max_length=50)),
                 ('lastname', models.CharField(max_length=50)),
-                ('date_of_birth', DateTimeWithoutTZField()),
+                ('date_of_birth', models.DateField()),
                 ('is_active', models.BooleanField(default=True)),
 
                 (
