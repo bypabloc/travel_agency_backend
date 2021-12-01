@@ -7,7 +7,7 @@ def paginate_queryset(request):
         params = params[1].split('&')
         for param in params:
             param = param.split('=')
-            dict[param[0]] = param[1] if 2 == len(param) else ''
+            dict[param[0]] = param[1].replace('%20' , ' ').strip() if 2 == len(param) else ''
     
     per_page = dict['per_page'] if 'per_page' in dict else None
     page = dict['page'] if 'page' in dict else None
@@ -59,23 +59,3 @@ def paginate_queryset(request):
     dict['filter'] = filtrate
 
     return dict
-
-# export default async (req, res, next) => {
-#     try {
-#         const { per_page, page } = req.body;
-
-#         const per_page_formatted = per_page ? (per_page > 0 ? per_page : 10) : 10;
-#         const page_formatted = ( page ? (page < 0 ? 1 : page) : 1 );
-        
-#         req['pagination'] = {
-#             page: page_formatted,
-#             per_page: per_page_formatted,
-#             offset: (page_formatted - 1) * per_page_formatted,
-#         }
-
-#         next();
-#     } catch(errors) {
-#         console.log('Errors:', errors);
-#         return response.sendUnprocessableEntity(res, { errors });
-#     }
-# };

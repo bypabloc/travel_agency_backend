@@ -1,5 +1,6 @@
 from .model_fields_types import model_fields_types
-import datetime
+from datetime import datetime
+import pytz
 
 def model_apply_filter(model, query, params):
 
@@ -18,11 +19,6 @@ def model_apply_filter(model, query, params):
     print('fields:', fields)
 
     if 'filter_by' in filters and 'filter' in filters:
-
-        print('filter_by:', filters['filter_by'])
-        print('filter:', filters['filter'])
-        print('type:', filters['type'])
-
         if filters['type'] == 'CharField':
             query = query.extra(where=[''+filters['filter_by']+' LIKE %s'], params=['%'+filters['filter']+'%'])
         
@@ -35,9 +31,11 @@ def model_apply_filter(model, query, params):
             filter_value = filters['filter']
 
             try:
-                datetime.datetime.strptime(filter_value, '%Y-%m-%d %H:%M:%S')
-                query = query.extra(where=[''+filters['filter_by']+' = %s'], params=[filters['filter']])
+                datetima_fomatted = datetime.strptime(filter_value, '%Y-%m-%d %H:%M:%S')
+                dt_utc = datetima_fomatted.astimezone(pytz.UTC)
+                query = query.filter(**{filters['filter_by']: dt_utc})
             except ValueError:
+                print('ValueError:', ValueError)
                 pass
 
         else:
