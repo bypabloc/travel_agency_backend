@@ -1,0 +1,5 @@
+Django==3.2.9
+djangorestframework==3.12.4
+django-model-utils==4.2.0
+postgres==4.0
+python-dotenv==0.19.2
