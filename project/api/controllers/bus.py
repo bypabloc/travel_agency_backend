@@ -1,9 +1,11 @@
+from django.db.models import query
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models.functions import Lower
 from rest_framework.response import Response
 from ..helpers.pagination import paginate_queryset
+from ..helpers.model_apply_sort import model_apply_sort
+from ..helpers.model_apply_filter import model_apply_filter
 from ..models import Bus
 
 @api_view(['GET'])
@@ -11,23 +13,18 @@ from ..models import Bus
 def list(request):
     data = {}
     try:
-        queries = paginate_queryset(request)
-        print('queries: ',queries)
+        params = paginate_queryset(request)
+        print('params: ',params)
 
-        filters = {}
+        buses = Bus.objects
 
-        buses = Bus.objects.filter(**filters)
-
-        # buses = buses.raw("ORDER BY " + queries['sort_by'] + " " + queries['sort'])
-
-        sort_by = queries['sort_by']
-        buses = buses.extra(select={''+sort_by+'':'LOWER('+sort_by+')'})
-        if queries['sort'] == 'asc':
-            buses = buses.order_by(Lower(''+sort_by+'').asc())
-        else:
-            buses = buses.order_by(Lower(''+sort_by+'').desc())
+        buses = model_apply_filter(model=Bus, query=buses, params=params)
+        buses = model_apply_sort(model=Bus, query=buses, params=params)
+        buses = buses[params['offset']:params['per_page']]
 
         data['buses'] = buses
+
+        return Response(data, status=status.HTTP_200_OK)
 
     except Exception as ex:
         trace = []
@@ -46,18 +43,19 @@ def list(request):
             'trace': trace,
         }
 
-    return Response(data, status=status.HTTP_200_OK)
-    
+        return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
 @csrf_exempt
 def findOne(request):
 
-    return Response({}, status=status.HTTP_201_CREATED)
+    return Response({}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @csrf_exempt
 def create(request):
+
+    
     
     return Response({}, status=status.HTTP_201_CREATED)
 

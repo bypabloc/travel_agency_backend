@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.timezone import now
 
 class Bus(models.Model):
-    id = models.BigIntegerField(unique=True, primary_key=True)
     plate = models.CharField(max_length=10, unique=True)
     color = models.CharField(max_length=6)
     brand = models.CharField(max_length=50)

@@ -3,7 +3,7 @@ from ..controllers.bus import list, findOne, create, state_change
 
 urlpatterns = [
     path('list', list, name='list'),
-    path('findOne', findOne, name='findOne'),
+    path('find_one', findOne, name='findOne'),
     path('create', create, name='create'),
     path('state_change', state_change, name='state_change'),
 ]
