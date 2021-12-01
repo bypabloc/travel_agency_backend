@@ -12,3 +12,16 @@ def getErrorsFormatted(self):
             errors_list[key].append(error['message'])
 
     return errors_list
+
+def modelToJson(model):
+    
+    dictionary = {}
+
+    fields = model._meta.fields
+    for field in fields:
+        if field.name == 'id':
+            dictionary['id'] = model.id
+        else:
+            dictionary[field.name] = getattr(model, field.name)
+
+    return dictionary

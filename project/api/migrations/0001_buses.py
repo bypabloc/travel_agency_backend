@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
                 ('brand', models.CharField(max_length=50)),
                 ('model', models.CharField(max_length=50)),
                 ('serial', models.CharField(max_length=100, unique=True)),
-                ('year', models.DateTimeField()),
+                ('year', models.PositiveSmallIntegerField()),
                 ('is_active', models.BooleanField(default=True)),
 
                 ('created_at', models.DateTimeField(auto_now_add=True)),

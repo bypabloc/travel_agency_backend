@@ -1,8 +1,3 @@
-
-    # param1 = request.GET['param1']
-    # param2 = request.GET['param2']
-    # param1 = request.GET.get('param1')
-    # param2 = request.GET.get('param2')
 def paginate_queryset(request):
 
     params = request.get_full_path()
