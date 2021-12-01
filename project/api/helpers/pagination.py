@@ -53,7 +53,7 @@ def paginate_queryset(request):
         filter_by = False
         filtrate = False
     
-    dict['per_page'] = per_page
+    dict['limit'] = per_page
     dict['page'] = page
     dict['offset'] = (page - 1) * per_page
 

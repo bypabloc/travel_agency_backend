@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from ..helpers.pagination import paginate_queryset
 from ..helpers.model_apply_sort import model_apply_sort
 from ..helpers.model_apply_filter import model_apply_filter
+from ..helpers.model_apply_pagination import model_apply_pagination
 from ..models import Bus
 
 @api_view(['GET'])
@@ -20,7 +21,7 @@ def list(request):
 
         buses = model_apply_filter(model=Bus, query=buses, params=params)
         buses = model_apply_sort(model=Bus, query=buses, params=params)
-        buses = buses[params['offset']:params['per_page']]
+        buses = model_apply_pagination(query=buses, params=params)
 
         data['buses'] = buses
 
@@ -55,7 +56,7 @@ def findOne(request):
 @csrf_exempt
 def create(request):
 
-    
+
     
     return Response({}, status=status.HTTP_201_CREATED)
 
