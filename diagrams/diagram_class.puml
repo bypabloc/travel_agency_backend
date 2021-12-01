@@ -8,7 +8,7 @@ class Bus{
     +{field} brand : String
     +{field} model : String
     +{field} serial : String << unique >>
-    +{field} year : Date
+    +{field} year : SmallInteger
     +{field} is_active : Boolean 
     -{field} created_at : Datetime 
     -{field} updated_at : Datetime 
