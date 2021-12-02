@@ -97,3 +97,23 @@ class Passenger(models.Model):
             instance.is_whitelist = True
         else:
             instance.updated_at = current_datetime
+
+class Seat(models.Model):
+    seat_x = models.PositiveSmallIntegerField()
+    seat_y = models.CharField(max_length=1)
+    is_active = models.BooleanField(default=True)
+
+    created_at = DateTimeWithoutTZField(null=True)
+    updated_at = DateTimeWithoutTZField(null=True)
+
+    @receiver(pre_save)
+    def pre_save(sender, instance, **kwargs): 
+        current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if instance._state.adding:
+            instance.created_at = current_datetime
+            instance.seat_y = instance.seat_y.upper()
+            instance.is_active = True
+        else:
+            instance.seat_y = instance.seat_y.upper()
+            instance.updated_at = current_datetime
+
