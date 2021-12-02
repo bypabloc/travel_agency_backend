@@ -76,6 +76,9 @@ class BusFindOneForm():
         else:
             self.errors[field] = [error]
 
+    def getErrors(self):
+        return self.errors
+
 class BusStateChangeForm(forms.Form):
     id = forms.IntegerField(required=True)
     active = forms.IntegerField(min_value=0,max_value=1,required=True)

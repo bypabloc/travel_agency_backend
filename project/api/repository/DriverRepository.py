@@ -7,13 +7,9 @@ from ..helpers.model_apply_sort import model_apply_sort
 from ..helpers.model_apply_filter import model_apply_filter
 from ..helpers.model_apply_pagination import model_apply_pagination
 
-from datetime import date
-
 class DriverListForm():
     def list(self):
-        request = self.request
-
-        params = paginate_queryset(request)
+        params = paginate_queryset(self.request)
 
         drivers = Driver.objects
 
@@ -79,6 +75,9 @@ class DriverFindOneForm():
             self.errors[field].append(error)
         else:
             self.errors[field] = [error]
+
+    def getErrors(self):
+        return self.errors
 
 class DriverStateChangeForm(forms.Form):
     id = forms.IntegerField(required=True)
