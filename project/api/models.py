@@ -60,3 +60,21 @@ class Location(models.Model):
             instance.is_active = True
         else:
             instance.updated_at = current_datetime
+
+class Journey(models.Model):
+    duration_in_seconds = models.PositiveBigIntegerField()
+    location_origin = models.ForeignKey(Location, related_name='location_origin', on_delete=models.CASCADE)
+    location_destination = models.ForeignKey(Location, related_name='location_destination', on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+
+    created_at = DateTimeWithoutTZField(null=True)
+    updated_at = DateTimeWithoutTZField(null=True)
+
+    @receiver(pre_save)
+    def pre_save(sender, instance, **kwargs): 
+        current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if instance._state.adding:
+            instance.created_at = current_datetime
+            instance.is_active = True
+        else:
+            instance.updated_at = current_datetime
