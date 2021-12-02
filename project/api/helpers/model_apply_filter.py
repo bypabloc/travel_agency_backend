@@ -1,5 +1,5 @@
 from .model_fields_types import model_fields_types
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 
 def model_apply_filter(model, query, params):
@@ -30,10 +30,22 @@ def model_apply_filter(model, query, params):
         elif filters['type'] == 'DateTimeField':
             filter_value = filters['filter']
 
+            tz_in_minutes = params['tz_in_minutes']
+            
+            if tz_in_minutes.isnumeric():
+                tz_in_minutes = int(params['tz_in_minutes'])
+            else:
+                if tz_in_minutes.startswith("-") and tz_in_minutes[1:].isdigit():
+                    tz_in_minutes = int(tz_in_minutes) # * -1:
+                else:
+                    tz_in_minutes = 0
+
             try:
-                datetima_fomatted = datetime.strptime(filter_value, '%Y-%m-%d %H:%M:%S')
-                dt_utc = datetima_fomatted.astimezone(pytz.UTC)
-                query = query.filter(**{filters['filter_by']: dt_utc})
+                datetime_fomatted = datetime.strptime(filter_value, '%Y-%m-%d %H:%M:%S')
+
+                datetime_with_tz = datetime_fomatted + timedelta(minutes=tz_in_minutes)
+
+                query = query.filter(**{filters['filter_by']: datetime_with_tz})
             except ValueError:
                 print('ValueError:', ValueError)
                 pass
