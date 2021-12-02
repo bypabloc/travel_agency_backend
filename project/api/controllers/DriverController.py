@@ -36,14 +36,14 @@ def findOne(request):
 @csrf_exempt
 def create(request):
     try:
-        data = {
-            'message': ['Driver created successfully']
-        }
+        data = {}
+        message = ['Driver created successfully']
+        
         driver = DriverCreateForm(request.POST)
 
         if driver.is_valid():
-            driver.save()
-            return sendCreated(data=data)
+            data['driver'] = driver.save()
+            return sendCreated(data=data, message=message)
         else:
             return sendUnprocessableEntity(errors=driver.getErrors())
     except Exception as ex:

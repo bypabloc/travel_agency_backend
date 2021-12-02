@@ -50,11 +50,9 @@ class DriverCreateForm(forms.Form):
         return data
 
     def save(self):
-        print('self.cleaned_data', self.cleaned_data)
+        driver = Driver.objects.create(**self.cleaned_data)
 
-        Driver.objects.create(**self.cleaned_data)
-
-        return {}
+        return modelToJson(model=driver)
 
     def getErrors(self):
         return getErrorsFormatted(self)
