@@ -9,7 +9,7 @@ def model_apply_pagination(query, params):
 
     records_filtered = list.count()
 
-    print('query',list.all().query)
+    # print('query -> ',list.select_related('bus').all().query) 
 
     return {
         'page': offset,
@@ -18,5 +18,5 @@ def model_apply_pagination(query, params):
         'last_page': math.ceil(records_filtered / limit),
         'next_page': offset + 1 if (offset < records_filtered / limit) else None,
         'prev_page': offset - 1 if (offset > 1) else None,
-        'list': list.all().values(),
+        'list': list.all()
     }

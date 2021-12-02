@@ -15,8 +15,17 @@ class DriverListForm():
 
         drivers = model_apply_filter(model=Driver, query=drivers, params=params)
         drivers = model_apply_sort(model=Driver, query=drivers, params=params)
+        drivers = model_apply_pagination(query=drivers, params=params)
 
-        return model_apply_pagination(query=drivers, params=params)
+        list = drivers['list'].all()
+
+        list_formatted = []
+        for driver in list:
+            list_formatted.append(modelToJson(driver))
+
+        drivers['list'] = list_formatted
+
+        return drivers
 
 class DriverCreateForm(forms.Form):
     document = forms.CharField(max_length=15)

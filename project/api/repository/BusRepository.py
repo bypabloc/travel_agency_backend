@@ -11,16 +11,23 @@ from datetime import date
 
 class BusListForm():
     def list(self):
-        request = self.request
-
-        params = paginate_queryset(request)
+        params = paginate_queryset(self.request)
 
         buses = Bus.objects
 
         buses = model_apply_filter(model=Bus, query=buses, params=params)
         buses = model_apply_sort(model=Bus, query=buses, params=params)
+        buses = model_apply_pagination(query=buses, params=params)
 
-        return model_apply_pagination(query=buses, params=params)
+        list = buses['list'].all()
+
+        list_formatted = []
+        for driver in list:
+            list_formatted.append(modelToJson(driver))
+
+        buses['list'] = list_formatted
+
+        return buses
 
 class BusCreateForm(forms.Form):
     plate = forms.CharField(max_length=10)
