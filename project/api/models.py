@@ -85,15 +85,17 @@ class JourneyDriver(models.Model):
 def pre_save(sender, instance, **kwargs): 
     current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    if str(type(instance)).find('Migration') == -1:
-        if instance == Seat:
-            instance.seat_y = instance.seat_y.upper()
-
-        if instance == JourneyDriver:
-            if instance.states:
-                instance.states = 1
+    name_instance = str(type(instance))
+    if name_instance.find('Migration') == -1:
 
         if instance._state.adding:
+
+            if name_instance.find('Seat') != -1:
+                instance.seat_y = instance.seat_y.upper()
+            elif name_instance.find('JourneyDriver') != -1:
+                if not instance.states:
+                    instance.states = 1
+
             instance.created_at = current_datetime
             instance.is_active = True
         else:

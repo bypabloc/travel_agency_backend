@@ -1,6 +1,5 @@
 from .model_fields_types import model_fields_types
 from datetime import datetime, timedelta
-import pytz
 
 def model_apply_filter(model, query, params):
 
