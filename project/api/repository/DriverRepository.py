@@ -1,5 +1,5 @@
 from django import forms
-from ..models import Bus
+from ..models import Driver, Bus
 
 from .helpers import getErrorsFormatted, modelToJson
 from ..helpers.pagination import paginate_queryset
@@ -7,58 +7,60 @@ from ..helpers.model_apply_sort import model_apply_sort
 from ..helpers.model_apply_filter import model_apply_filter
 from ..helpers.model_apply_pagination import model_apply_pagination
 
-from datetime import date
-
-class BusListForm():
+class DriverListForm():
     def list(self):
         params = paginate_queryset(self.request)
 
-        buses = Bus.objects
+        drivers = Driver.objects
 
-        buses = model_apply_filter(model=Bus, query=buses, params=params)
-        buses = model_apply_sort(model=Bus, query=buses, params=params)
-        buses = model_apply_pagination(query=buses, params=params)
+        drivers = model_apply_filter(model=Driver, query=drivers, params=params)
+        drivers = model_apply_sort(model=Driver, query=drivers, params=params)
+        drivers = model_apply_pagination(query=drivers, params=params)
 
-        list = buses['list'].all()
+        list = drivers['list'].all()
 
         list_formatted = []
         for item in list:
             list_formatted.append(modelToJson(item))
 
-        buses['list'] = list_formatted
+        drivers['list'] = list_formatted
 
-        return buses
+        return drivers
 
-class BusCreateForm(forms.Form):
-    plate = forms.CharField(max_length=10)
-    color = forms.CharField(max_length=6)
-    brand = forms.CharField(max_length=50)
-    model = forms.CharField(max_length=50)
-    serial = forms.CharField(max_length=100)
-    year = forms.IntegerField(min_value=1000,max_value=date.today().year)
+class DriverCreateForm(forms.Form):
+    document = forms.CharField(max_length=15)
+    names = forms.CharField(max_length=50)
+    lastname = forms.CharField(max_length=50)
+    date_of_birth = forms.DateField()
     is_active = forms.BooleanField(required=False)
+    bus = forms.IntegerField()
+    # bus = forms.ForeignKey(Bus)
 
     def clean(self):
         data = self.cleaned_data
 
-        if 'plate' in data:
-            if Bus.objects.filter(plate=data['plate']).exists():
-                self.add_error('plate', 'Already exists')
+        if 'document' in data:
+            if Driver.objects.filter(document=data['document']).exists():
+                self.add_error('document', 'Already exists')
 
-        if 'serial' in data:
-            if Bus.objects.filter(serial=data['serial']).exists():
-                self.add_error('serial', 'Already exists')
-        
+        if 'bus' in data:
+            bus = Bus.objects.filter(id=data['bus'])
+            if not bus.exists():
+                self.add_error('bus', 'Does not exist')
+            else:
+                self.cleaned_data['bus'] = bus.first()
+
         return data
 
     def save(self):
-        bus = Bus.objects.create(**self.cleaned_data)
-        return modelToJson(model=bus)
+        driver = Driver.objects.create(**self.cleaned_data)
+
+        return modelToJson(model=driver)
 
     def getErrors(self):
         return getErrorsFormatted(self)
 
-class BusFindOneForm():
+class DriverFindOneForm():
     errors = {}
 
     def is_valid(self):
@@ -66,7 +68,7 @@ class BusFindOneForm():
         params = paginate_queryset(self.request)
         
         if 'id' in params:
-            self.instance = Bus.objects.filter(id=params['id'])
+            self.instance = Driver.objects.filter(id=params['id'])
             if not self.instance.exists():
                 self.add_error(field='id', error='Not exists')
         else:
@@ -86,7 +88,7 @@ class BusFindOneForm():
     def getErrors(self):
         return self.errors
 
-class BusStateChangeForm(forms.Form):
+class DriverStateChangeForm(forms.Form):
     id = forms.IntegerField(required=True)
     active = forms.IntegerField(min_value=0,max_value=1,required=True)
 
@@ -94,7 +96,7 @@ class BusStateChangeForm(forms.Form):
         data = self.cleaned_data
 
         if 'id' in data:
-            self.instance = Bus.objects.filter(id=data['id'])
+            self.instance = Driver.objects.filter(id=data['id'])
             if not self.instance.exists():
                 self.add_error('id', 'Not exists')
             else:
@@ -105,12 +107,12 @@ class BusStateChangeForm(forms.Form):
     def save(self):
         data = self.cleaned_data
 
-        bus = self.instance
-        bus.is_active = data['active']
+        driver = self.instance
+        driver.is_active = data['active']
 
-        bus.save()
+        driver.save()
 
-        return modelToJson(model=bus)
+        return modelToJson(model=driver)
 
     def getErrors(self):
         return getErrorsFormatted(self)

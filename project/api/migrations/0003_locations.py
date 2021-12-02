@@ -14,7 +14,6 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 
                 ('name', models.CharField(max_length=50, unique=True)),
-
                 ('is_active', models.BooleanField(default=True)),
 
                 ('created_at', DateTimeWithoutTZField(auto_now_add=True)),

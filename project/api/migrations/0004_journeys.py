@@ -17,14 +17,14 @@ class Migration(migrations.Migration):
                 ('is_active', models.BooleanField(default=True)),
 
                 (
-                    'location_id_origin',
+                    'location_origin',
                     models.ForeignKey(
                         on_delete=models.deletion.DO_NOTHING,
                         to='api.Location',
                     ),
                 ),
                 (
-                    'location_id_destination',
+                    'location_destination',
                     models.ForeignKey(
                         on_delete=models.deletion.DO_NOTHING,
                         to='api.Location',
