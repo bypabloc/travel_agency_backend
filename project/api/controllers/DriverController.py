@@ -9,9 +9,9 @@ from ..helpers.response import sendSuccess, sendCreated, sendUnprocessableEntity
 def list(request):
     try:
         data = {}
-        driveres = DriverListForm()
-        driveres.request = request
-        data['driveres'] = driveres.list()
+        drivers = DriverListForm()
+        drivers.request = request
+        data['drivers'] = drivers.list()
 
         return sendSuccess(data=data)
     except Exception as ex:
