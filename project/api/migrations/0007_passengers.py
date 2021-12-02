@@ -19,14 +19,6 @@ class Migration(migrations.Migration):
                 ('date_of_birth', DateTimeWithoutTZField()),
                 ('is_whitelist', models.BooleanField(default=True)),
 
-                (
-                    'bus',
-                    models.ForeignKey(
-                        on_delete=models.deletion.DO_NOTHING,
-                        to='api.Bus',
-                    ),
-                ),
-
                 ('created_at', DateTimeWithoutTZField(auto_now_add=True)),
                 ('updated_at', DateTimeWithoutTZField(null=True)),
             ],

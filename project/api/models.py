@@ -78,3 +78,22 @@ class Journey(models.Model):
             instance.is_active = True
         else:
             instance.updated_at = current_datetime
+
+class Passenger(models.Model):
+    document = models.CharField(max_length=15, unique=True)
+    names = models.CharField(max_length=50)
+    lastname = models.CharField(max_length=50)
+    date_of_birth = models.DateField()
+    is_whitelist = models.BooleanField(default=True)
+
+    created_at = DateTimeWithoutTZField(null=True)
+    updated_at = DateTimeWithoutTZField(null=True)
+
+    @receiver(pre_save)
+    def pre_save(sender, instance, **kwargs): 
+        current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if instance._state.adding:
+            instance.created_at = current_datetime
+            instance.is_whitelist = True
+        else:
+            instance.updated_at = current_datetime
