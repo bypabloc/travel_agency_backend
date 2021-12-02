@@ -17,14 +17,14 @@ class Migration(migrations.Migration):
                 ('states', models.PositiveSmallIntegerField()),
 
                 (
-                    'journey_id',
+                    'journey',
                     models.ForeignKey(
                         on_delete=models.deletion.DO_NOTHING,
                         to='api.Journey',
                     ),
                 ),
                 (
-                    'driver_id',
+                    'driver',
                     models.ForeignKey(
                         on_delete=models.deletion.DO_NOTHING,
                         to='api.Driver',

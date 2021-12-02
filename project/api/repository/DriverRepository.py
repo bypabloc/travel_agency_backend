@@ -77,7 +77,7 @@ class DriverFindOneForm():
         return False if len(self.errors) > 0 else True
 
     def find(self):
-        return self.instance.all().values().first()
+        return modelToJson(model=self.instance.all().first())
 
     def add_error(self, field, error):
         if field in self.errors:
