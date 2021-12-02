@@ -57,8 +57,8 @@ class JourneyCreateForm(forms.Form):
                     location_origin=data['location_origin'],
                     location_destination=data['location_destination'],
                 ).exists():
-                self.add_error('location_origin', 'Destination already exists')
-                self.add_error('location_destination', 'Destination already exists')
+                self.add_error('location_origin', 'Journey already exists')
+                self.add_error('location_destination', 'Journey already exists')
 
         return data
 
