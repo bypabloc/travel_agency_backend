@@ -20,8 +20,8 @@ class DriverListForm():
         list = drivers['list'].all()
 
         list_formatted = []
-        for driver in list:
-            list_formatted.append(modelToJson(driver))
+        for item in list:
+            list_formatted.append(modelToJson(item))
 
         drivers['list'] = list_formatted
 
