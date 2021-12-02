@@ -1,8 +1,6 @@
 from django import forms
 from ..models import Driver, Bus
 
-from django.core import serializers
-
 from .helpers import getErrorsFormatted, modelToJson
 from ..helpers.pagination import paginate_queryset
 from ..helpers.model_apply_sort import model_apply_sort
