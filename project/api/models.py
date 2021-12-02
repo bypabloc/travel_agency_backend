@@ -32,7 +32,6 @@ class Driver(models.Model):
     date_of_birth = models.DateField()
     is_active = models.BooleanField(default=True)
     bus = models.ForeignKey(Bus, related_name='bus', on_delete=models.CASCADE)
-    # bus = models.OneToOneField(Bus, on_delete=models.CASCADE)
 
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
