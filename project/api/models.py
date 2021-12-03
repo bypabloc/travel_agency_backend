@@ -81,6 +81,28 @@ class JourneyDriver(models.Model):
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
 
+class Ticket(models.Model):
+    states = models.PositiveSmallIntegerField()
+
+    passenger = models.ForeignKey(
+        Passenger, 
+        related_name='passenger', 
+        on_delete=models.CASCADE, 
+    )
+    journey_driver = models.ForeignKey(
+        JourneyDriver, 
+        related_name='journey_driver', 
+        on_delete=models.CASCADE, 
+    )
+    seat = models.ForeignKey(
+        Seat, 
+        related_name='seat', 
+        on_delete=models.CASCADE, 
+    )
+
+    created_at = DateTimeWithoutTZField(null=True)
+    updated_at = DateTimeWithoutTZField(null=True)
+
 @receiver(pre_save)
 def pre_save(sender, instance, **kwargs): 
     current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -93,6 +115,9 @@ def pre_save(sender, instance, **kwargs):
             if name_instance.find('Seat') != -1:
                 instance.seat_y = instance.seat_y.upper()
             elif name_instance.find('JourneyDriver') != -1:
+                if not instance.states:
+                    instance.states = 1
+            elif name_instance.find('Ticket') != -1:
                 if not instance.states:
                     instance.states = 1
 
