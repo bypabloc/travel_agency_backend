@@ -12,18 +12,33 @@ class JourneyListForm():
         params = paginate_queryset(self.request)
 
         journeys = Journey.objects
+        
+        journeys = journeys.average_sells()
+
+        print('average_sells -> ',journeys.query)
 
         journeys = model_apply_filter(model=Journey, query=journeys, params=params)
+
         journeys = model_apply_sort(model=Journey, query=journeys, params=params)
+
         journeys = model_apply_pagination(query=journeys, params=params)
+
+        print('average_sells -> ',journeys['list'].query)
 
         list = journeys['list'].all()
 
-        list_formatted = []
-        for item in list:
-            list_formatted.append(modelToJson(item))
+        # consultar la tabla JourneyDriver y luego la tabla Ticket
+        # para obtener la cantidad total de tickets vendidos por cada viaje
+        # y mostrarlo en el campo "tickets" de la tabla Journey
 
-        journeys['list'] = list_formatted
+        # journeys_list = Journey.objects.average_sells()
+        # print('average_sells -> ',journeys_list)
+
+        # list_formatted = []
+        # for item in list:
+        #     list_formatted.append(modelToJson(item))
+
+        journeys['list'] = list
 
         return journeys
 

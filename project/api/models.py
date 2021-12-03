@@ -1,4 +1,8 @@
 from django.db import models
+from django.db.models.expressions import OuterRef, Subquery
+from django.db.models.functions import JSONObject
+from django.contrib.postgres.aggregates.general import JSONBAgg
+
 from django.db.models.signals import pre_save, pre_migrate, post_migrate
 from django.dispatch import receiver
 from datetime import datetime, timedelta
@@ -35,6 +39,25 @@ class Location(models.Model):
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
 
+class JourneyManager(models.Manager):
+    def average_sells(self):
+
+        journeys_drivers = JourneyDriver.objects.filter(
+            journey_id=OuterRef('pk'),
+        ).values('journey_id').annotate(
+            list=JSONBAgg(
+                JSONObject(
+                    datetime_start='datetime_start',
+                ),
+            ),
+        ).values('list')
+
+        journeys_subquery = self.annotate(
+            journeys_drivers=Subquery(journeys_drivers),
+        )
+
+        return journeys_subquery
+
 class Journey(models.Model):
     duration_in_seconds = models.PositiveBigIntegerField()
     location_origin = models.ForeignKey(Location, related_name='location_origin', on_delete=models.CASCADE)
@@ -43,6 +66,8 @@ class Journey(models.Model):
 
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
+
+    objects = JourneyManager()
 
 class Passenger(models.Model):
     document = models.CharField(max_length=15, unique=True)
@@ -80,7 +105,6 @@ class Seat(models.Model):
 
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
-
 
 class Ticket(models.Model):
     states = models.PositiveSmallIntegerField()

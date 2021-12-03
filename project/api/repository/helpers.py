@@ -22,6 +22,7 @@ def modelToJson(model):
         if field.name == 'id':
             dictionary['id'] = model.id
         else:
+            print('field.name: ', field.name)
             value = getattr(model, field.name)
             if str(type(value)).find('api.models.') != -1:
                 value = modelToJson(value)
