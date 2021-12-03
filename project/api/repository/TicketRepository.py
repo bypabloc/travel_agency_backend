@@ -36,8 +36,6 @@ class TicketCreateForm(forms.Form):
     def clean(self):
         data = self.cleaned_data
 
-
-
         passenger = False
         if 'passenger' in data:
             passenger = Passenger.objects.filter(id=data['passenger'])
@@ -87,6 +85,12 @@ class TicketCreateForm(forms.Form):
             ).exists():
                 self.add_error('journey_driver', 'The passenger is already assigned')
                 self.add_error('passenger', 'The passenger is already assigned')
+            elif ticket.filter(
+                journey_driver=journey_driver,
+            ).count() >= 10:
+                self.add_error('passenger', 'The journey is full')
+                self.add_error('journey_driver', 'The journey is full')
+                self.add_error('seat', 'The journey is full')
 
         return data
 
