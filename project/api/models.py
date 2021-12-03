@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.expressions import OuterRef, Subquery
+from django.db.models.expressions import OuterRef, Subquery, RawSQL
 from django.db.models.functions import JSONObject
 from django.contrib.postgres.aggregates.general import JSONBAgg
 
@@ -40,23 +40,44 @@ class Location(models.Model):
     updated_at = DateTimeWithoutTZField(null=True)
 
 class JourneyManager(models.Manager):
-    def average_sells(self):
+    def average_passengers(self):
 
-        journeys_drivers = JourneyDriver.objects.filter(
+        return self.annotate(
+            average_passengers=RawSQL(
+                """
+                    SELECT 
+                        AVG (1)::NUMERIC(10,2)
+                    FROM 
+                        api_journeydriver AS jd
+                    RIGHT JOIN api_ticket AS ticket ON ticket.journey_driver_id = jd.id
+                    WHERE 
+                        jd.journey_id = api_journey.id  
+                    GROUP BY jd.id
+                """,
+                ()
+            )
+        )
+
+    def journeys_drivers(self):
+
+        journeys_drivers = JourneyDriver.objects.tickets().filter(
             journey_id=OuterRef('pk'),
         ).values('journey_id').annotate(
             list=JSONBAgg(
                 JSONObject(
                     datetime_start='datetime_start',
+                    states='states',
+                    journey='journey',
+                    driver='driver',
+                    created_at='created_at',
+                    updated_at='updated_at',
                 ),
             ),
         ).values('list')
 
-        journeys_subquery = self.annotate(
+        return self.annotate(
             journeys_drivers=Subquery(journeys_drivers),
         )
-
-        return journeys_subquery
 
 class Journey(models.Model):
     duration_in_seconds = models.PositiveBigIntegerField()
@@ -79,6 +100,24 @@ class Passenger(models.Model):
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
 
+
+class JourneyDriverManager(models.Manager):
+    def tickets(self):
+
+        tickets = Ticket.objects.filter(
+            journey_driver_id=OuterRef('pk'),
+        ).values('journey_driver_id').annotate(
+            list=JSONBAgg(
+                JSONObject(
+                    created_at='created_at',
+                ),
+            ),
+        ).values('list')
+
+        return self.annotate(
+            tickets=Subquery(tickets),
+        )
+
 class JourneyDriver(models.Model):
     datetime_start = DateTimeWithoutTZField(null=True)
     states = models.PositiveSmallIntegerField()
@@ -96,6 +135,8 @@ class JourneyDriver(models.Model):
 
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
+
+    objects = JourneyDriverManager()
 
 class Seat(models.Model):
 
