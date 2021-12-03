@@ -1,5 +1,5 @@
 from django import forms
-from ..models import Seat
+from ..models import Seat, JourneyDriver, Ticket
 from django.core.validators import RegexValidator
 
 from .helpers import getErrorsFormatted, modelToJson
@@ -121,3 +121,52 @@ class SeatStateChangeForm(forms.Form):
 
     def getErrors(self):
         return getErrorsFormatted(self)
+
+class SeatListAvailabilityForm():
+    errors = {}
+    seats_availability = []
+
+    def is_valid(self):
+        self.errors = {}
+        params = paginate_queryset(self.request)
+        
+        journey_driver = False
+        tickets = False
+        if not 'journey_driver' in params:
+            self.add_error('journey_driver', 'Field is required')
+        else:
+            journey_driver = JourneyDriver.objects.filter(id=params['journey_driver'])
+            if not journey_driver.exists():
+                self.add_error(field='journey_driver', error='Not exists')
+            else:
+                journey_driver = journey_driver.first()
+                tickets = [item[0] for item in Ticket.objects.filter(journey_driver=journey_driver).all().values_list('seat_id')]
+
+
+        if journey_driver:
+            seats = Seat.objects.filter(
+                is_active=1,
+            ).all().values('id', 'seat_x', 'seat_y')
+            for seat in seats:
+                is_available = True
+                if seat['id'] in tickets:
+                    is_available = False
+
+                self.seats_availability.append({
+                    **seat,
+                    'is_available': is_available,
+                })
+
+        return False if len(self.errors) > 0 else True
+
+    def list(self):
+        return self.seats_availability
+
+    def add_error(self, field, error):
+        if field in self.errors:
+            self.errors[field].append(error)
+        else:
+            self.errors[field] = [error]
+
+    def getErrors(self):
+        return self.errors
