@@ -1,6 +1,5 @@
 from .model_fields_types import model_fields_types
 from datetime import datetime, timedelta
-import pytz
 
 def model_apply_filter(model, query, params):
 
@@ -26,6 +25,47 @@ def model_apply_filter(model, query, params):
             filter_value = filters['filter']
             if filter_value.isdigit():
                 query = query.filter(**{filters['filter_by']: int(filter_value)})
+
+        elif filters['type'] == 'BooleanField' :
+            filter_value = filters['filter']
+            print('filter_value:', filter_value)
+            if (
+                filter_value == 'True' or 
+                filter_value == 'true' or 
+                filter_value == '1' or 
+                filter_value == 'yes' or 
+                filter_value == 'y' or 
+                filter_value == 't' or 
+                filter_value == 'T' or 
+                filter_value == 'Y' or 
+                filter_value == 'Yes' or 
+
+                filter_value == 'False' or 
+                filter_value == 'false' or 
+                filter_value == '0' or 
+                filter_value == 'no' or 
+                filter_value == 'n' or 
+                filter_value == 'f' or 
+                filter_value == 'F' or 
+                filter_value == 'N' or 
+                filter_value == 'No'
+            ):
+                filters['filter'] = True;
+                if (
+                    filter_value == 'True' or 
+                    filter_value == 'true' or 
+                    filter_value == '1' or 
+                    filter_value == 'yes' or 
+                    filter_value == 'y' or 
+                    filter_value == 't' or 
+                    filter_value == 'T' or 
+                    filter_value == 'Y' or 
+                    filter_value == 'Yes'
+                ):
+                    filters['filter'] = True;
+                else:
+                    filters['filter'] = False;
+                query = query.filter(**{filters['filter_by']: filters['filter']})
 
         elif filters['type'] == 'DateTimeField':
             filter_value = filters['filter']

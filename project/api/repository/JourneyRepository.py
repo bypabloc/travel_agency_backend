@@ -57,8 +57,8 @@ class JourneyCreateForm(forms.Form):
                     location_origin=data['location_origin'],
                     location_destination=data['location_destination'],
                 ).exists():
-                self.add_error('location_origin', 'Destination already exists')
-                self.add_error('location_destination', 'Destination already exists')
+                self.add_error('location_origin', 'Journey already exists')
+                self.add_error('location_destination', 'Journey already exists')
 
         return data
 
@@ -87,7 +87,7 @@ class JourneyFindOneForm():
         return False if len(self.errors) > 0 else True
 
     def find(self):
-        return self.instance.all().values().first()
+        return modelToJson(model=self.instance.all().first())
 
     def add_error(self, field, error):
         if field in self.errors:

@@ -16,21 +16,21 @@ class Migration(migrations.Migration):
                 ('states', models.PositiveSmallIntegerField()),
 
                 (
-                    'passenger_id',
+                    'passenger',
                     models.ForeignKey(
                         on_delete=models.deletion.DO_NOTHING,
                         to='api.Passenger',
                     ),
                 ),
                 (
-                    'journey_driver_id',
+                    'journey_driver',
                     models.ForeignKey(
                         on_delete=models.deletion.DO_NOTHING,
                         to='api.JourneyDriver',
                     ),
                 ),
                 (
-                    'seat_id',
+                    'seat',
                     models.ForeignKey(
                         on_delete=models.deletion.DO_NOTHING,
                         to='api.Seat',

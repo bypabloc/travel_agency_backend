@@ -1,5 +1,5 @@
 from django import forms
-from ..models import Driver, Bus
+from ..models import Passenger
 
 from .helpers import getErrorsFormatted, modelToJson
 from ..helpers.pagination import paginate_queryset
@@ -7,60 +7,51 @@ from ..helpers.model_apply_sort import model_apply_sort
 from ..helpers.model_apply_filter import model_apply_filter
 from ..helpers.model_apply_pagination import model_apply_pagination
 
-class DriverListForm():
+class PassengerListForm():
     def list(self):
         params = paginate_queryset(self.request)
 
-        drivers = Driver.objects
+        passengers = Passenger.objects
 
-        drivers = model_apply_filter(model=Driver, query=drivers, params=params)
-        drivers = model_apply_sort(model=Driver, query=drivers, params=params)
-        drivers = model_apply_pagination(query=drivers, params=params)
+        passengers = model_apply_filter(model=Passenger, query=passengers, params=params)
+        passengers = model_apply_sort(model=Passenger, query=passengers, params=params)
+        passengers = model_apply_pagination(query=passengers, params=params)
 
-        list = drivers['list'].all()
+        list = passengers['list'].all()
 
         list_formatted = []
         for item in list:
             list_formatted.append(modelToJson(item))
 
-        drivers['list'] = list_formatted
+        passengers['list'] = list_formatted
 
-        return drivers
+        return passengers
 
-class DriverCreateForm(forms.Form):
+class PassengerCreateForm(forms.Form):
     document = forms.CharField(max_length=15)
     names = forms.CharField(max_length=50)
     lastname = forms.CharField(max_length=50)
     date_of_birth = forms.DateField()
-    is_active = forms.BooleanField(required=False)
-    bus = forms.IntegerField()
-    # bus = forms.ForeignKey(Bus)
+    is_whitelist = forms.BooleanField(required=False)
 
     def clean(self):
         data = self.cleaned_data
 
         if 'document' in data:
-            if Driver.objects.filter(document=data['document']).exists():
+            if Passenger.objects.filter(document=data['document']).exists():
                 self.add_error('document', 'Already exists')
-
-        if 'bus' in data:
-            bus = Bus.objects.filter(id=data['bus'])
-            if not bus.exists():
-                self.add_error('bus', 'Does not exist')
-            else:
-                self.cleaned_data['bus'] = bus.first()
 
         return data
 
     def save(self):
-        driver = Driver.objects.create(**self.cleaned_data)
+        passenger = Passenger.objects.create(**self.cleaned_data)
 
-        return modelToJson(model=driver)
+        return modelToJson(model=passenger)
 
     def getErrors(self):
         return getErrorsFormatted(self)
 
-class DriverFindOneForm():
+class PassengerFindOneForm():
     errors = {}
 
     def is_valid(self):
@@ -68,7 +59,7 @@ class DriverFindOneForm():
         params = paginate_queryset(self.request)
         
         if 'id' in params:
-            self.instance = Driver.objects.filter(id=params['id'])
+            self.instance = Passenger.objects.filter(id=params['id'])
             if not self.instance.exists():
                 self.add_error(field='id', error='Not exists')
         else:
@@ -88,7 +79,7 @@ class DriverFindOneForm():
     def getErrors(self):
         return self.errors
 
-class DriverStateChangeForm(forms.Form):
+class PassengerStateChangeForm(forms.Form):
     id = forms.IntegerField(required=True)
     active = forms.IntegerField(min_value=0,max_value=1,required=True)
 
@@ -96,7 +87,7 @@ class DriverStateChangeForm(forms.Form):
         data = self.cleaned_data
 
         if 'id' in data:
-            self.instance = Driver.objects.filter(id=data['id'])
+            self.instance = Passenger.objects.filter(id=data['id'])
             if not self.instance.exists():
                 self.add_error('id', 'Not exists')
             else:
@@ -107,12 +98,12 @@ class DriverStateChangeForm(forms.Form):
     def save(self):
         data = self.cleaned_data
 
-        driver = self.instance
-        driver.is_active = data['active']
+        passenger = self.instance
+        passenger.is_whitelist = data['active']
 
-        driver.save()
+        passenger.save()
 
-        return modelToJson(model=driver)
+        return modelToJson(model=passenger)
 
     def getErrors(self):
         return getErrorsFormatted(self)
