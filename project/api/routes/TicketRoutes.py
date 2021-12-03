@@ -1,9 +1,10 @@
 from django.urls import path
-from ..controllers.TicketController import list, findOne, create, state_change
+from ..controllers.TicketController import list, findOne, create, state_change, seat_change
 
 urlpatterns = [
     path('list', list, name='list'),
     path('find_one', findOne, name='findOne'),
     path('create', create, name='create'),
     path('state_change', state_change, name='state_change'),
+    path('seat_change', seat_change, name='seat_change'),
 ]

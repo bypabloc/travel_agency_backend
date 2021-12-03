@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 
-from ..repository.TicketRepository import TicketListForm, TicketCreateForm, TicketFindOneForm, TicketStateChangeForm
+from ..repository.TicketRepository import TicketListForm, TicketCreateForm, TicketFindOneForm, TicketStateChangeForm, TicketSeatChangeForm
 from ..helpers.response import sendSuccess, sendCreated, sendUnprocessableEntity, sendInternalServerError
 
 @api_view(['GET'])
@@ -48,13 +48,28 @@ def create(request):
     except Exception as ex:
         return sendInternalServerError(ex=ex)
 
-
 @api_view(['POST'])
 @csrf_exempt
 def state_change(request):
     try:
         data = {}
         ticket = TicketStateChangeForm(request.POST)
+
+        if ticket.is_valid():
+            data['ticket'] = ticket.save()
+            print('data', data)
+            return sendSuccess(data=data)
+        else:
+            return sendUnprocessableEntity(errors=ticket.getErrors())
+    except Exception as ex:
+        return sendInternalServerError(ex=ex)
+
+@api_view(['POST'])
+@csrf_exempt
+def seat_change(request):
+    try:
+        data = {}
+        ticket = TicketSeatChangeForm(request.POST)
 
         if ticket.is_valid():
             data['ticket'] = ticket.save()

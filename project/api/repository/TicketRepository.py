@@ -36,13 +36,16 @@ class TicketCreateForm(forms.Form):
     def clean(self):
         data = self.cleaned_data
 
+
+
         passenger = False
         if 'passenger' in data:
             passenger = Passenger.objects.filter(id=data['passenger'])
             if not passenger.exists():
                 self.add_error('passenger', 'Does not exist')
             else:
-                self.cleaned_data['passenger'] = passenger.first()
+                passenger = passenger.first()
+                self.cleaned_data['passenger'] = passenger
 
         journey_driver = False
         if 'journey_driver' in data:
@@ -50,7 +53,8 @@ class TicketCreateForm(forms.Form):
             if not journey_driver.exists():
                 self.add_error('journey_driver', 'Does not exist')
             else:
-                self.cleaned_data['journey_driver'] = journey_driver.first()
+                journey_driver = journey_driver.first()
+                self.cleaned_data['journey_driver'] = journey_driver
 
         seat = False
         if 'seat' in data:
@@ -58,10 +62,34 @@ class TicketCreateForm(forms.Form):
             if not seat.exists():
                 self.add_error('seat', 'Does not exist')
             else:
-                self.cleaned_data['seat'] = seat.first()
+                seat = seat.first()
+                self.cleaned_data['seat'] = seat
         
         if passenger and journey_driver and seat:
-            self.add_error('passenger', 'Passenger, JourneyDriver or Seat is required')
+            ticket = Ticket.objects.filter()
+            if ticket.filter(
+                passenger=passenger, 
+                journey_driver=journey_driver, 
+                seat=seat,
+            ).exists():
+                self.add_error('passenger', 'The ticket already exists')
+                self.add_error('journey_driver', 'The ticket already exists')
+                self.add_error('seat', 'The ticket already exists')
+            elif ticket.filter(
+                journey_driver=journey_driver,
+                seat=seat,
+            ).exists():
+                self.add_error('journey_driver', 'The seat is already taken')
+                self.add_error('seat', 'The seat is already taken')
+            elif ticket.filter(
+                journey_driver=journey_driver,
+                passenger=passenger,
+            ).exists():
+                self.add_error('journey_driver', 'The passenger is already assigned')
+                self.add_error('passenger', 'The passenger is already assigned')
+        #     self.add_error('passenger', '')
+
+        # self.add_error('passenger', 'Passenger, JourneyDriver or Seat is required')
 
         return data
 
@@ -115,6 +143,46 @@ class TicketStateChangeForm(forms.Form):
             else:
                 self.instance = self.instance.first()
         
+        return data
+
+    def save(self):
+        data = self.cleaned_data
+
+        ticket = self.instance
+        ticket.states = data['states']
+
+        ticket.save()
+
+        return modelToJson(model=ticket)
+
+    def getErrors(self):
+        return getErrorsFormatted(self)
+
+class TicketSeatChangeForm(forms.Form):
+    id = forms.IntegerField()
+    seat = forms.IntegerField()
+
+    def clean(self):
+        data = self.cleaned_data
+
+        if 'id' in data:
+            self.instance = Ticket.objects.filter(id=data['id'])
+            if not self.instance.exists():
+                self.add_error('id', 'Not exists')
+            else:
+                self.instance = self.instance.first()
+
+        seat = False
+        if 'seat' in data:
+            seat = Seat.objects.filter(id=data['seat'])
+            if not seat.exists():
+                self.add_error('seat', 'Does not exist')
+            else:
+                seat = seat.first()
+                self.cleaned_data['seat'] = seat
+                if seat.id == self.instance.seat.id:
+                    self.add_error('seat', 'Must indicate another seat.')
+
         return data
 
     def save(self):

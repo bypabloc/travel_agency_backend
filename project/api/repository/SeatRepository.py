@@ -40,12 +40,21 @@ class SeatCreateForm(forms.Form):
         data = self.cleaned_data
         
         if 'seat_x' in data and 'seat_y' in data:
-            if Seat.objects.filter(
-                seat_x=data['seat_x'], 
-                seat_y=data['seat_y']
+            seat_x = int(data['seat_x'])
+            if seat_x > 3:
+                self.add_error('seat_x', 'X must be less than 3')
+            elif Seat.objects.filter(
+                seat_x=data['seat_x'],
+                seat_y=data['seat_y'],
             ).exists():
                 self.add_error('seat_x', 'Seat already exists')
                 self.add_error('seat_y', 'Seat already exists')
+
+        if Seat.objects.filter(
+                is_active=1,
+            ).count() >= 10:
+                self.add_error('seat_x', 'The maximum number of active seats is 10')
+                self.add_error('seat_y', 'The maximum number of active seats is 10')
         
         return data
 
