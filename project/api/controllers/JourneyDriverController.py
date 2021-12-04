@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 
-from ..repository.JourneyDriverRepository import JourneyDriverListForm, JourneyDriverCreateForm, JourneyDriverFindOneForm, JourneyDriverStateChangeForm, JourneyDriverChangeDriverForm
+from ..repository.JourneyDriverRepository import JourneyDriverListForm, JourneyDriverCreateForm, JourneyDriverFindOneForm, JourneyDriverStateChangeForm, JourneyDriverChangeDriverForm, JourneyDriverJourneysForm
 from ..helpers.response import sendSuccess, sendCreated, sendUnprocessableEntity, sendInternalServerError
 
 @api_view(['GET'])
@@ -78,6 +78,21 @@ def driver_change(request):
             return sendSuccess(data=data)
         else:
             return sendUnprocessableEntity(errors=journey_driver.getErrors())
+    except Exception as ex:
+        return sendInternalServerError(ex=ex)
+
+@api_view(['GET'])
+@csrf_exempt
+def journeys(request):
+    try:
+        data = {}
+        journeys_drivers = JourneyDriverJourneysForm()
+        journeys_drivers.request = request
+        if journeys_drivers.is_valid():
+            data['journeys_drivers'] = journeys_drivers.list()
+            return sendSuccess(data=data)
+        else:
+            return sendUnprocessableEntity(errors=journeys_drivers.getErrors())
     except Exception as ex:
         return sendInternalServerError(ex=ex)
 

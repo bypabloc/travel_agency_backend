@@ -36,8 +36,6 @@ class TicketCreateForm(forms.Form):
     def clean(self):
         data = self.cleaned_data
 
-
-
         passenger = False
         if 'passenger' in data:
             passenger = Passenger.objects.filter(id=data['passenger'])
@@ -87,9 +85,12 @@ class TicketCreateForm(forms.Form):
             ).exists():
                 self.add_error('journey_driver', 'The passenger is already assigned')
                 self.add_error('passenger', 'The passenger is already assigned')
-        #     self.add_error('passenger', '')
-
-        # self.add_error('passenger', 'Passenger, JourneyDriver or Seat is required')
+            elif ticket.filter(
+                journey_driver=journey_driver,
+            ).count() >= 10:
+                self.add_error('passenger', 'The journey is full')
+                self.add_error('journey_driver', 'The journey is full')
+                self.add_error('seat', 'The journey is full')
 
         return data
 
@@ -172,16 +173,18 @@ class TicketSeatChangeForm(forms.Form):
             else:
                 self.instance = self.instance.first()
 
-        seat = False
-        if 'seat' in data:
-            seat = Seat.objects.filter(id=data['seat'])
-            if not seat.exists():
-                self.add_error('seat', 'Does not exist')
-            else:
-                seat = seat.first()
-                self.cleaned_data['seat'] = seat
-                if seat.id == self.instance.seat.id:
-                    self.add_error('seat', 'Must indicate another seat.')
+        if self.instance:
+            seat = False
+            if 'seat' in data:
+                seat = Seat.objects.filter(id=data['seat'])
+                if not seat.exists():
+                    self.add_error('seat', 'Does not exist')
+                else:
+                    seat = seat.first()
+                    self.cleaned_data['seat'] = seat
+                    print(seat)
+                    if seat.id == self.instance.seat.id:
+                        self.add_error('seat', 'Must indicate another seat.')
 
         return data
 
@@ -189,7 +192,7 @@ class TicketSeatChangeForm(forms.Form):
         data = self.cleaned_data
 
         ticket = self.instance
-        ticket.states = data['states']
+        ticket.seat = data['seat']
 
         ticket.save()
 

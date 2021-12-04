@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 
-from ..repository.SeatRepository import SeatListForm, SeatCreateForm, SeatFindOneForm, SeatStateChangeForm
+from ..repository.SeatRepository import SeatListForm, SeatCreateForm, SeatFindOneForm, SeatStateChangeForm, SeatListAvailabilityForm
 from ..helpers.response import sendSuccess, sendCreated, sendUnprocessableEntity, sendInternalServerError
 
 @api_view(['GET'])
@@ -49,7 +49,6 @@ def create(request):
     except Exception as ex:
         return sendInternalServerError(ex=ex)
 
-
 @api_view(['POST'])
 @csrf_exempt
 def state_change(request):
@@ -60,6 +59,21 @@ def state_change(request):
         if seat.is_valid():
             data['seat'] = seat.save()
             print('data', data)
+            return sendSuccess(data=data)
+        else:
+            return sendUnprocessableEntity(errors=seat.getErrors())
+    except Exception as ex:
+        return sendInternalServerError(ex=ex)
+
+@api_view(['GET'])
+@csrf_exempt
+def list_availability(request):
+    try:
+        data = {}
+        seat = SeatListAvailabilityForm()
+        seat.request = request
+        if seat.is_valid():
+            data['seats'] = seat.list()
             return sendSuccess(data=data)
         else:
             return sendUnprocessableEntity(errors=seat.getErrors())

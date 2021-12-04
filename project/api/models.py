@@ -1,9 +1,90 @@
 from django.db import models
+from django.db.models.expressions import OuterRef, Subquery, RawSQL
+from django.db.models.functions import JSONObject
+from django.contrib.postgres.aggregates.general import JSONBAgg
+
 from django.db.models.signals import pre_save, pre_migrate, post_migrate
 from django.dispatch import receiver
 from datetime import datetime, timedelta
 from .helpers.date_time_without_tz_field import DateTimeWithoutTZField
 import random
+
+class BusManager(models.Manager):
+    def filters_custom(self, **kwargs):
+
+        print('kwargs: ', kwargs)
+
+        buses = self
+
+        if 'more_than_percentage_of_capacity_sold' in kwargs:
+            more_than_percentage_of_capacity_sold = kwargs['more_than_percentage_of_capacity_sold']
+
+            buses = buses.extra(
+                where = [
+                    '''
+                    (
+                        SELECT
+                            COUNT(*)
+                        FROM
+                            "api_driver"
+                        INNER JOIN "api_journeydriver" ON "api_journeydriver"."driver_id" = "api_driver"."id"
+                        INNER JOIN "api_ticket" ON "api_ticket"."journey_driver_id" = "api_journeydriver"."id"
+                        WHERE
+                            "api_driver"."bus_id" = "api_bus"."id"
+                        GROUP BY
+                            "api_driver"."bus_id"
+                    ) / 10 > %s
+                    ''',
+                ],
+                params = [
+                    more_than_percentage_of_capacity_sold,
+                ],
+            ).annotate(
+                percentage_of_capacity_sold=RawSQL(
+                    """
+                        (
+                            SELECT
+                                COUNT(*)
+                            FROM
+                                "api_driver"
+                            INNER JOIN "api_journeydriver" ON "api_journeydriver"."driver_id" = "api_driver"."id"
+                            INNER JOIN "api_ticket" ON "api_ticket"."journey_driver_id" = "api_journeydriver"."id"
+                            WHERE
+                                "api_driver"."bus_id" = "api_bus"."id"
+                            GROUP BY
+                                "api_driver"."bus_id"
+                        ) / 10
+                    """,
+                    ()
+                )
+            )
+
+        if 'journey' in kwargs:
+            journey = kwargs['journey']
+
+            buses = buses.extra(
+                where = [
+                    '''
+                        SELECT
+                            CASE 
+                                WHEN COUNT(*) > 0 THEN TRUE
+                                ELSE FALSE
+                            END
+                        FROM 
+                            "api_driver"
+                        INNER JOIN "api_journeydriver" ON "api_journeydriver"."driver_id" = "api_driver"."id"
+                        WHERE
+                            "api_driver"."bus_id" = "api_bus"."id"
+                            AND "api_journeydriver"."journey_id" = %s
+                        LIMIT 1
+                    ''',
+                ],
+                params = [
+                    journey,
+                ],
+            )
+
+        return buses
 
 class Bus(models.Model):
     plate = models.CharField(max_length=10, unique=True)
@@ -13,6 +94,8 @@ class Bus(models.Model):
     serial = models.CharField(max_length=100, unique=True)
     year = models.PositiveSmallIntegerField()
     is_active = models.BooleanField(default=True)
+
+    objects = BusManager()
 
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
@@ -35,6 +118,45 @@ class Location(models.Model):
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
 
+class JourneyManager(models.Manager):
+    def average_passengers(self):
+        return self.annotate(
+            average_passengers=RawSQL(
+                """
+                    SELECT 
+                        AVG (1)::NUMERIC(10,2)
+                    FROM 
+                        api_journeydriver AS jd
+                    RIGHT JOIN api_ticket AS ticket ON ticket.journey_driver_id = jd.id
+                    WHERE 
+                        jd.journey_id = api_journey.id  
+                    GROUP BY jd.id
+                """,
+                ()
+            )
+        )
+
+    def journeys_drivers(self):
+
+        journeys_drivers = JourneyDriver.objects.tickets().filter(
+            journey_id=OuterRef('pk'),
+        ).values('journey_id').annotate(
+            list=JSONBAgg(
+                JSONObject(
+                    datetime_start='datetime_start',
+                    states='states',
+                    journey='journey',
+                    driver='driver',
+                    created_at='created_at',
+                    updated_at='updated_at',
+                ),
+            ),
+        ).values('list')
+
+        return self.annotate(
+            journeys_drivers=Subquery(journeys_drivers),
+        )
+
 class Journey(models.Model):
     duration_in_seconds = models.PositiveBigIntegerField()
     location_origin = models.ForeignKey(Location, related_name='location_origin', on_delete=models.CASCADE)
@@ -43,6 +165,8 @@ class Journey(models.Model):
 
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
+
+    objects = JourneyManager()
 
 class Passenger(models.Model):
     document = models.CharField(max_length=15, unique=True)
@@ -54,14 +178,26 @@ class Passenger(models.Model):
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
 
-class Seat(models.Model):
+class JourneyDriverManager(models.Manager):
+    def journeys(self, location_origin, location_destination, date_start, date_end, tz_in_minutes=0):
 
-    seat_x = models.PositiveSmallIntegerField()
-    seat_y = models.CharField(max_length=1)
-    is_active = models.BooleanField(default=True)
-
-    created_at = DateTimeWithoutTZField(null=True)
-    updated_at = DateTimeWithoutTZField(null=True)
+        return self.filter(
+            journey__location_origin_id=location_origin,
+            journey__location_destination_id=location_destination,
+            # datetime_start__gte=date_start,
+            # datetime_start__lte=date_end,
+        ).extra(
+            where = [
+                '''
+                    datetime_start - (%s ||\' minutes\')::interval BETWEEN %s AND %s
+                ''',
+            ],
+            params = [
+                tz_in_minutes,
+                date_start,
+                date_end,
+            ],
+        )
 
 class JourneyDriver(models.Model):
     datetime_start = DateTimeWithoutTZField(null=True)
@@ -77,6 +213,17 @@ class JourneyDriver(models.Model):
         related_name='driver', 
         on_delete=models.CASCADE, 
     )
+
+    created_at = DateTimeWithoutTZField(null=True)
+    updated_at = DateTimeWithoutTZField(null=True)
+
+    objects = JourneyDriverManager()
+
+class Seat(models.Model):
+
+    seat_x = models.PositiveSmallIntegerField()
+    seat_y = models.CharField(max_length=1)
+    is_active = models.BooleanField(default=True)
 
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)

@@ -1,5 +1,8 @@
 from django import forms
 from ..models import Journey, Location
+from rest_framework import serializers
+from django.core import serializers as django_serializers
+from rest_framework.renderers import JSONRenderer
 
 from .helpers import getErrorsFormatted, modelToJson
 from ..helpers.pagination import paginate_queryset
@@ -7,23 +10,36 @@ from ..helpers.model_apply_sort import model_apply_sort
 from ..helpers.model_apply_filter import model_apply_filter
 from ..helpers.model_apply_pagination import model_apply_pagination
 
+class JourneySerializer(serializers.Serializer):
+    class Meta:
+        model = Journey
+        fields = '__all__'
+
 class JourneyListForm():
     def list(self):
         params = paginate_queryset(self.request)
 
         journeys = Journey.objects
+        
+        journeys = journeys.average_passengers()
 
         journeys = model_apply_filter(model=Journey, query=journeys, params=params)
+
         journeys = model_apply_sort(model=Journey, query=journeys, params=params)
+
         journeys = model_apply_pagination(query=journeys, params=params)
 
-        list = journeys['list'].all()
+        list = journeys['list'].all().values(
+            "id",
+            "location_origin",
+            "location_destination",
+            "is_active",
+            "created_at",
+            "updated_at",
+            'average_passengers',
+        )
 
-        list_formatted = []
-        for item in list:
-            list_formatted.append(modelToJson(item))
-
-        journeys['list'] = list_formatted
+        journeys['list'] = list
 
         return journeys
 
@@ -126,3 +142,4 @@ class JourneyStateChangeForm(forms.Form):
 
     def getErrors(self):
         return getErrorsFormatted(self)
+
