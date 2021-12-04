@@ -14,18 +14,37 @@ class BusListForm():
         params = paginate_queryset(self.request)
 
         buses = Bus.objects
+        if 'more_than_percentage_of_capacity_sold' in params:
+            percentage = params['more_than_percentage_of_capacity_sold']
+            buses = buses.more_than_percentage_of_capacity_sold(percentage)
 
+        if 'journey' in params:
+            buses = buses.journey(params['journey'])
+            pass
+        
         buses = model_apply_filter(model=Bus, query=buses, params=params)
         buses = model_apply_sort(model=Bus, query=buses, params=params)
         buses = model_apply_pagination(query=buses, params=params)
 
-        list = buses['list'].all()
+        list = buses['list'].all().values(
+            "id",
+            "plate",
+            "color",
+            "brand",
+            "model",
+            "serial",
+            "year",
+            "is_active",
+            "created_at",
+            "updated_at",
+            # "percentage_of_capacity_sold",
+        )
 
-        list_formatted = []
-        for item in list:
-            list_formatted.append(modelToJson(item))
+        # list_formatted = []
+        # for item in list:
+        #     list_formatted.append(modelToJson(item))
 
-        buses['list'] = list_formatted
+        buses['list'] = list
 
         return buses
 

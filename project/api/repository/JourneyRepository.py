@@ -29,9 +29,6 @@ class JourneyListForm():
 
         journeys = model_apply_pagination(query=journeys, params=params)
 
-        # print('journeys_drivers -> ',journeys['list'],'\n')
-        # print('journeys_drivers -> query ',journeys['list'].query,'\n')
-
         list = journeys['list'].all().values(
             "id",
             "location_origin",

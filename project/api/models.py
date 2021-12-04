@@ -9,6 +9,74 @@ from datetime import datetime, timedelta
 from .helpers.date_time_without_tz_field import DateTimeWithoutTZField
 import random
 
+class BusManager(models.Manager):
+    def more_than_percentage_of_capacity_sold(self, percentage):
+
+        print('percentage: ', percentage)
+
+        return self.annotate(
+            percentage_of_capacity_sold=RawSQL(
+                """
+                    (
+                        SELECT
+                            COUNT(*)
+                        FROM
+                            "api_driver"
+                        INNER JOIN "api_journeydriver" ON "api_journeydriver"."driver_id" = "api_driver"."id"
+                        INNER JOIN "api_ticket" ON "api_ticket"."journey_driver_id" = "api_journeydriver"."id"
+                        WHERE
+                            "api_driver"."bus_id" = "api_bus"."id"
+                        GROUP BY
+                            "api_driver"."bus_id"
+                    ) / 10
+                """,
+                ()
+            )
+        ).extra(
+            where = [
+                '''
+                (
+                    SELECT
+                        COUNT(*)
+                    FROM
+                        "api_driver"
+                    INNER JOIN "api_journeydriver" ON "api_journeydriver"."driver_id" = "api_driver"."id"
+                    INNER JOIN "api_ticket" ON "api_ticket"."journey_driver_id" = "api_journeydriver"."id"
+                    WHERE
+                        "api_driver"."bus_id" = "api_bus"."id"
+                    GROUP BY
+                        "api_driver"."bus_id"
+                ) / 10 > %s
+                ''',
+            ],
+            params = [
+                percentage,
+            ],
+        )
+
+    def journey(self, journey):
+        return self.extra(
+            where = [
+                '''
+                    SELECT
+                        CASE 
+                            WHEN COUNT(*) > 0 THEN TRUE
+                            ELSE FALSE
+                        END
+                    FROM 
+                        "api_driver"
+                    INNER JOIN "api_journeydriver" ON "api_journeydriver"."driver_id" = "api_driver"."id"
+                    WHERE
+                        "api_driver"."bus_id" = "api_bus"."id"
+                        AND "api_journeydriver"."journey_id" = %s
+                    LIMIT 1
+                ''',
+            ],
+            params = [
+                journey,
+            ],
+        )
+
 class Bus(models.Model):
     plate = models.CharField(max_length=10, unique=True)
     color = models.CharField(max_length=6)
@@ -17,6 +85,8 @@ class Bus(models.Model):
     serial = models.CharField(max_length=100, unique=True)
     year = models.PositiveSmallIntegerField()
     is_active = models.BooleanField(default=True)
+
+    objects = BusManager()
 
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
@@ -99,7 +169,6 @@ class Passenger(models.Model):
 
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
-
 
 class JourneyDriverManager(models.Manager):
     def journeys(self, location_origin, location_destination, date_start, date_end, tz_in_minutes=0):
