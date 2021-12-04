@@ -102,20 +102,33 @@ class Passenger(models.Model):
 
 
 class JourneyDriverManager(models.Manager):
-    def tickets(self):
+    def journeys(self, location_origin, location_destination, date_start, date_end, tz_in_minutes=0):
 
-        tickets = Ticket.objects.filter(
-            journey_driver_id=OuterRef('pk'),
-        ).values('journey_driver_id').annotate(
-            list=JSONBAgg(
-                JSONObject(
-                    created_at='created_at',
-                ),
-            ),
-        ).values('list')
-
-        return self.annotate(
-            tickets=Subquery(tickets),
+        return self.filter(
+            journey__location_origin_id=location_origin,
+            journey__location_destination_id=location_destination,
+            # datetime_start__gte=date_start,
+            # datetime_start__lte=date_end,
+        ).extra(
+            where = [
+                '''
+                    datetime_start - (%s ||\' minutes\')::interval >= %s 
+                ''',
+            ],
+            params = [
+                tz_in_minutes,
+                date_start,
+            ],
+        ).extra(
+            where = [
+                '''
+                    datetime_start - (%s ||\' minutes\')::interval <= %s 
+                ''',
+            ],
+            params = [
+                tz_in_minutes,
+                date_end,
+            ],
         )
 
 class JourneyDriver(models.Model):

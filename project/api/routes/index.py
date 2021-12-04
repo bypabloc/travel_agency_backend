@@ -9,4 +9,5 @@ urlpatterns = [
     path('seat/', include('api.routes.SeatRoutes')),
     path('journey_driver/', include('api.routes.JourneyDriverRoutes')),
     path('ticket/', include('api.routes.TicketRoutes')),
+    
 ]

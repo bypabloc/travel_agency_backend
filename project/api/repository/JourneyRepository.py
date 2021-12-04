@@ -145,3 +145,4 @@ class JourneyStateChangeForm(forms.Form):
 
     def getErrors(self):
         return getErrorsFormatted(self)
+

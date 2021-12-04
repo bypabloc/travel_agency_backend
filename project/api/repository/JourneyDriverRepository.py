@@ -209,3 +209,97 @@ class JourneyDriverChangeDriverForm(forms.Form):
 
     def getErrors(self):
         return getErrorsFormatted(self)
+
+class JourneyDriverJourneysForm():
+
+    errors = {}
+    cleaned_data = {}
+
+    def is_valid(self):
+        self.errors = {}
+
+        params = paginate_queryset(self.request)
+        self.params = params
+
+        self.cleaned_data['tz_in_minutes'] = params['tz_in_minutes']
+        
+        if not 'location_origin' in params:
+            self.add_error('location_origin', 'You must indicate a source location')
+        elif not params['location_origin']:
+            self.add_error('location_origin', 'You must indicate a source location')
+        else:
+            self.cleaned_data['location_origin'] = params['location_origin']
+        
+        if not 'location_destination' in params:
+            self.add_error('location_destination', 'You must indicate a destination location')
+        elif not params['location_destination']:
+            self.add_error('location_destination', 'You must indicate a destination location')
+        else:
+            self.cleaned_data['location_destination'] = params['location_destination']
+        
+        if not 'date_start' in params:
+            self.add_error('date_start', 'You must indicate a start date')
+        elif not params['date_start']:
+            self.add_error('date_start', 'You must indicate a start date')
+        else:
+            date_start = params['date_start']
+            self.cleaned_data['date_start'] = date_start
+            try:
+                date_start = datetime.strptime(date_start + ' 00:00:00', '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                self.add_error('date_start', 'Not a valid date format (YYYY-MM-DD)')
+            self.cleaned_data['date_start'] = date_start
+        
+        if not 'date_end' in params:
+            self.add_error('date_end', 'You must indicate an end date')
+        elif not params['date_end']:
+            self.add_error('date_end', 'You must indicate an end date')
+        else:
+            date_end = params['date_end']
+            self.cleaned_data['date_end'] = date_end
+            try:
+                date_end = datetime.strptime(date_end + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                self.add_error('date_end', 'Not a valid date format (YYYY-MM-DD)')
+            self.cleaned_data['date_end'] = date_end
+        
+        return False if len(self.errors) > 0 else True
+
+    def list(self):
+        params = self.params
+        tz_in_minutes = self.cleaned_data['tz_in_minutes']
+        location_origin = self.cleaned_data['location_origin']
+        location_destination = self.cleaned_data['location_destination']
+        date_start = self.cleaned_data['date_start']
+        date_end = self.cleaned_data['date_end']
+
+        journeysdrivers = JourneyDriver.objects.journeys(
+            location_origin=location_origin,
+            location_destination=location_destination,
+            tz_in_minutes=tz_in_minutes,
+            date_start=date_start,
+            date_end=date_end,
+        )
+
+        journeysdrivers = model_apply_filter(model=JourneyDriver, query=journeysdrivers, params=params)
+        journeysdrivers = model_apply_sort(model=JourneyDriver, query=journeysdrivers, params=params)
+        journeysdrivers = model_apply_pagination(query=journeysdrivers, params=params)
+
+        list = journeysdrivers['list'].all()
+
+        list_formatted = []
+        for item in list:
+            list_formatted.append(modelToJson(item))
+
+        journeysdrivers['list'] = list_formatted
+
+        return journeysdrivers
+
+    def add_error(self, field, error):
+        if field in self.errors:
+            self.errors[field].append(error)
+        else:
+            self.errors[field] = [error]
+
+    def getErrors(self):
+        return self.errors
