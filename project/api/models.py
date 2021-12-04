@@ -10,13 +10,18 @@ from .helpers.date_time_without_tz_field import DateTimeWithoutTZField
 import random
 
 class BusManager(models.Manager):
-    def more_than_percentage_of_capacity_sold(self, percentage):
+    def filters_custom(self, **kwargs):
 
-        print('percentage: ', percentage)
+        print('kwargs: ', kwargs)
 
-        return self.annotate(
-            percentage_of_capacity_sold=RawSQL(
-                """
+        buses = self
+
+        if 'more_than_percentage_of_capacity_sold' in kwargs:
+            more_than_percentage_of_capacity_sold = kwargs['more_than_percentage_of_capacity_sold']
+
+            buses = buses.extra(
+                where = [
+                    '''
                     (
                         SELECT
                             COUNT(*)
@@ -28,54 +33,58 @@ class BusManager(models.Manager):
                             "api_driver"."bus_id" = "api_bus"."id"
                         GROUP BY
                             "api_driver"."bus_id"
-                    ) / 10
-                """,
-                ()
+                    ) / 10 > %s
+                    ''',
+                ],
+                params = [
+                    more_than_percentage_of_capacity_sold,
+                ],
+            ).annotate(
+                percentage_of_capacity_sold=RawSQL(
+                    """
+                        (
+                            SELECT
+                                COUNT(*)
+                            FROM
+                                "api_driver"
+                            INNER JOIN "api_journeydriver" ON "api_journeydriver"."driver_id" = "api_driver"."id"
+                            INNER JOIN "api_ticket" ON "api_ticket"."journey_driver_id" = "api_journeydriver"."id"
+                            WHERE
+                                "api_driver"."bus_id" = "api_bus"."id"
+                            GROUP BY
+                                "api_driver"."bus_id"
+                        ) / 10
+                    """,
+                    ()
+                )
             )
-        ).extra(
-            where = [
-                '''
-                (
-                    SELECT
-                        COUNT(*)
-                    FROM
-                        "api_driver"
-                    INNER JOIN "api_journeydriver" ON "api_journeydriver"."driver_id" = "api_driver"."id"
-                    INNER JOIN "api_ticket" ON "api_ticket"."journey_driver_id" = "api_journeydriver"."id"
-                    WHERE
-                        "api_driver"."bus_id" = "api_bus"."id"
-                    GROUP BY
-                        "api_driver"."bus_id"
-                ) / 10 > %s
-                ''',
-            ],
-            params = [
-                percentage,
-            ],
-        )
 
-    def journey(self, journey):
-        return self.extra(
-            where = [
-                '''
-                    SELECT
-                        CASE 
-                            WHEN COUNT(*) > 0 THEN TRUE
-                            ELSE FALSE
-                        END
-                    FROM 
-                        "api_driver"
-                    INNER JOIN "api_journeydriver" ON "api_journeydriver"."driver_id" = "api_driver"."id"
-                    WHERE
-                        "api_driver"."bus_id" = "api_bus"."id"
-                        AND "api_journeydriver"."journey_id" = %s
-                    LIMIT 1
-                ''',
-            ],
-            params = [
-                journey,
-            ],
-        )
+        if 'journey' in kwargs:
+            journey = kwargs['journey']
+
+            buses = buses.extra(
+                where = [
+                    '''
+                        SELECT
+                            CASE 
+                                WHEN COUNT(*) > 0 THEN TRUE
+                                ELSE FALSE
+                            END
+                        FROM 
+                            "api_driver"
+                        INNER JOIN "api_journeydriver" ON "api_journeydriver"."driver_id" = "api_driver"."id"
+                        WHERE
+                            "api_driver"."bus_id" = "api_bus"."id"
+                            AND "api_journeydriver"."journey_id" = %s
+                        LIMIT 1
+                    ''',
+                ],
+                params = [
+                    journey,
+                ],
+            )
+
+        return buses
 
 class Bus(models.Model):
     plate = models.CharField(max_length=10, unique=True)
@@ -111,7 +120,6 @@ class Location(models.Model):
 
 class JourneyManager(models.Manager):
     def average_passengers(self):
-
         return self.annotate(
             average_passengers=RawSQL(
                 """

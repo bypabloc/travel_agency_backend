@@ -14,19 +14,20 @@ class BusListForm():
         params = paginate_queryset(self.request)
 
         buses = Bus.objects
-        if 'more_than_percentage_of_capacity_sold' in params:
-            percentage = params['more_than_percentage_of_capacity_sold']
-            buses = buses.more_than_percentage_of_capacity_sold(percentage)
+        if 'more_than_percentage_of_capacity_sold' in params or 'journey' in params:
+            filters = {}
+            if 'journey' in params:
+                filters['journey'] = params['journey']
+            if 'more_than_percentage_of_capacity_sold' in params:
+                filters['more_than_percentage_of_capacity_sold'] = params['more_than_percentage_of_capacity_sold']
 
-        if 'journey' in params:
-            buses = buses.journey(params['journey'])
-            pass
-        
+            buses = buses.filters_custom(**filters)
+
         buses = model_apply_filter(model=Bus, query=buses, params=params)
         buses = model_apply_sort(model=Bus, query=buses, params=params)
         buses = model_apply_pagination(query=buses, params=params)
 
-        list = buses['list'].all().values(
+        values = [
             "id",
             "plate",
             "color",
@@ -37,8 +38,12 @@ class BusListForm():
             "is_active",
             "created_at",
             "updated_at",
-            # "percentage_of_capacity_sold",
-        )
+        ]
+        if 'more_than_percentage_of_capacity_sold' in params:
+            values.append('percentage_of_capacity_sold')
+            pass
+
+        list = buses['list'].all().values(*values)
 
         # list_formatted = []
         # for item in list:
