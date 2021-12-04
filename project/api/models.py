@@ -112,21 +112,12 @@ class JourneyDriverManager(models.Manager):
         ).extra(
             where = [
                 '''
-                    datetime_start - (%s ||\' minutes\')::interval >= %s 
+                    datetime_start - (%s ||\' minutes\')::interval BETWEEN %s AND %s
                 ''',
             ],
             params = [
                 tz_in_minutes,
                 date_start,
-            ],
-        ).extra(
-            where = [
-                '''
-                    datetime_start - (%s ||\' minutes\')::interval <= %s 
-                ''',
-            ],
-            params = [
-                tz_in_minutes,
                 date_end,
             ],
         )
