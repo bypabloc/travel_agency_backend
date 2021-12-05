@@ -297,7 +297,7 @@ def post_migrate(sender, plan, **kwargs):
     try:
         Bus.objects.create(
             plate = 'X-123',
-            color = '000000',
+            color = '#000000',
             brand = 'Toyota',
             model = 'Corolla',
             serial = '123456789',
