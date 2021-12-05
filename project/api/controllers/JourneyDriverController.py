@@ -37,7 +37,7 @@ def findOne(request):
 def create(request):
     try:
         data = {}
-        journey_driver = JourneyDriverCreateForm(request.POST)
+        journey_driver = JourneyDriverCreateForm(request.data)
         journey_driver.request = request
 
         if journey_driver.is_valid():
@@ -54,7 +54,7 @@ def create(request):
 def state_change(request):
     try:
         data = {}
-        journey_driver = JourneyDriverStateChangeForm(request.POST)
+        journey_driver = JourneyDriverStateChangeForm(request.data)
 
         if journey_driver.is_valid():
             data['journey_driver'] = journey_driver.save()
@@ -70,7 +70,7 @@ def state_change(request):
 def driver_change(request):
     try:
         data = {}
-        journey_driver = JourneyDriverChangeDriverForm(request.POST)
+        journey_driver = JourneyDriverChangeDriverForm(request.data)
 
         if journey_driver.is_valid():
             data['journey_driver'] = journey_driver.save()

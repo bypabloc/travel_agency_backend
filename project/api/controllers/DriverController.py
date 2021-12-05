@@ -39,7 +39,7 @@ def create(request):
         data = {}
         message = ['Driver created successfully']
         
-        driver = DriverCreateForm(request.POST)
+        driver = DriverCreateForm(request.data)
 
         if driver.is_valid():
             data['driver'] = driver.save()
@@ -55,7 +55,7 @@ def create(request):
 def state_change(request):
     try:
         data = {}
-        driver = DriverStateChangeForm(request.POST)
+        driver = DriverStateChangeForm(request.data)
 
         if driver.is_valid():
             data['driver'] = driver.save()

@@ -39,7 +39,7 @@ def create(request):
         data = {}
         message = ['Seat created successfully']
         
-        seat = SeatCreateForm(request.POST)
+        seat = SeatCreateForm(request.data)
 
         if seat.is_valid():
             data['seat'] = seat.save()
@@ -54,7 +54,7 @@ def create(request):
 def state_change(request):
     try:
         data = {}
-        seat = SeatStateChangeForm(request.POST)
+        seat = SeatStateChangeForm(request.data)
 
         if seat.is_valid():
             data['seat'] = seat.save()

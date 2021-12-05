@@ -37,7 +37,7 @@ def findOne(request):
 def create(request):
     try:
         data = {}
-        bus = BusCreateForm(request.POST)
+        bus = BusCreateForm(request.data)
 
         if bus.is_valid():
             data['bus'] = bus.save()
@@ -53,7 +53,7 @@ def create(request):
 def state_change(request):
     try:
         data = {}
-        bus = BusStateChangeForm(request.POST)
+        bus = BusStateChangeForm(request.data)
 
         if bus.is_valid():
             data['bus'] = bus.save()

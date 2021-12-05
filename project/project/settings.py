@@ -56,9 +56,11 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",
-    "http://127.0.0.1:8080",
+    # "http://localhost:8080",
+    # "http://127.0.0.1:8080",
 ]
+CORS_ORIGIN_ALLOW_ALL=True
+
 CORS_ALLOW_HEADERS = [
     "accept",
     "accept-encoding",
@@ -74,12 +76,8 @@ CORS_ALLOW_HEADERS = [
     "lg",
 ]
 CORS_ALLOW_METHODS = [
-    "DELETE",
     "GET",
-    "OPTIONS",
-    "PATCH",
     "POST",
-    "PUT",
 ]
 
 ROOT_URLCONF = 'project.urls'
