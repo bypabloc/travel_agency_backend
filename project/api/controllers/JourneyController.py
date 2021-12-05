@@ -39,7 +39,7 @@ def create(request):
         data = {}
         message = ['Journey created successfully']
         
-        journey = JourneyCreateForm(request.POST)
+        journey = JourneyCreateForm(request.data)
 
         if journey.is_valid():
             data['journey'] = journey.save()
@@ -55,7 +55,7 @@ def create(request):
 def state_change(request):
     try:
         data = {}
-        journey = JourneyStateChangeForm(request.POST)
+        journey = JourneyStateChangeForm(request.data)
 
         if journey.is_valid():
             data['journey'] = journey.save()

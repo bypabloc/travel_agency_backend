@@ -37,7 +37,7 @@ def findOne(request):
 def create(request):
     try:
         data = {}
-        location = LocationCreateForm(request.POST)
+        location = LocationCreateForm(request.data)
 
         if location.is_valid():
             data['location'] = location.save()
@@ -53,7 +53,7 @@ def create(request):
 def state_change(request):
     try:
         data = {}
-        location = LocationStateChangeForm(request.POST)
+        location = LocationStateChangeForm(request.data)
 
         if location.is_valid():
             data['location'] = location.save()

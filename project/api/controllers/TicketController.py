@@ -37,7 +37,7 @@ def findOne(request):
 def create(request):
     try:
         data = {}
-        ticket = TicketCreateForm(request.POST)
+        ticket = TicketCreateForm(request.data)
         ticket.request = request
 
         if ticket.is_valid():
@@ -53,7 +53,7 @@ def create(request):
 def state_change(request):
     try:
         data = {}
-        ticket = TicketStateChangeForm(request.POST)
+        ticket = TicketStateChangeForm(request.data)
 
         if ticket.is_valid():
             data['ticket'] = ticket.save()
@@ -69,7 +69,7 @@ def state_change(request):
 def seat_change(request):
     try:
         data = {}
-        ticket = TicketSeatChangeForm(request.POST)
+        ticket = TicketSeatChangeForm(request.data)
 
         if ticket.is_valid():
             data['ticket'] = ticket.save()

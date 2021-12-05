@@ -39,7 +39,7 @@ def create(request):
         data = {}
         message = ['Passenger created successfully']
         
-        passenger = PassengerCreateForm(request.POST)
+        passenger = PassengerCreateForm(request.data)
 
         if passenger.is_valid():
             data['passenger'] = passenger.save()
@@ -55,7 +55,7 @@ def create(request):
 def state_change(request):
     try:
         data = {}
-        passenger = PassengerStateChangeForm(request.POST)
+        passenger = PassengerStateChangeForm(request.data)
 
         if passenger.is_valid():
             data['passenger'] = passenger.save()

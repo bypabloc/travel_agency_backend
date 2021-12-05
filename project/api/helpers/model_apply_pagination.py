@@ -5,14 +5,14 @@ def model_apply_pagination(query, params):
     limit = params['limit']
     offset = int(params['offset'])
 
-    list = query[offset:limit]
+    records_filtered = query.count()
 
-    records_filtered = list.count()
+    list = query[offset:offset+limit]
 
     return {
-        'page': offset,
-        'current_page': offset,
+        'page': math.ceil(offset / limit + 1),
         'per_page' : limit,
+        'records_total' : records_filtered,
         'last_page': math.ceil(records_filtered / limit),
         'next_page': offset + 1 if (offset < records_filtered / limit) else None,
         'prev_page': offset - 1 if (offset > 1) else None,
