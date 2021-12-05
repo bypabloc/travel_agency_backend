@@ -11,8 +11,6 @@ def model_apply_pagination(query, params):
 
     return {
         'page': math.ceil(offset / limit + 1),
-        'offset' : offset,
-        'limit' : limit,
         'per_page' : limit,
         'records_total' : records_filtered,
         'last_page': math.ceil(records_filtered / limit),
