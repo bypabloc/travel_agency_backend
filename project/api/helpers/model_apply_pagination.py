@@ -5,9 +5,9 @@ def model_apply_pagination(query, params):
     limit = params['limit']
     offset = int(params['offset'])
 
-    list = query[offset:offset+limit]
+    records_filtered = query.count()
 
-    records_filtered = list.count()
+    list = query[offset:offset+limit]
 
     return {
         'page': math.ceil(offset / limit + 1),
