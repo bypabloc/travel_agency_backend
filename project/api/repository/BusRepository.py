@@ -59,7 +59,7 @@ class BusCreateForm(forms.Form):
     brand = forms.CharField(max_length=50)
     model = forms.CharField(max_length=50)
     serial = forms.CharField(max_length=100)
-    year = forms.IntegerField(min_value=1000,max_value=date.today().year)
+    year = forms.IntegerField(min_value=1000,max_value=date.today().year+1)
     is_active = forms.BooleanField(required=False)
 
     def clean(self):
