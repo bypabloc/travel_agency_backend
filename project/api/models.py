@@ -88,7 +88,7 @@ class BusManager(models.Manager):
 
 class Bus(models.Model):
     plate = models.CharField(max_length=10, unique=True)
-    color = models.CharField(max_length=6)
+    color = models.CharField(max_length=7)
     brand = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     serial = models.CharField(max_length=100, unique=True)
