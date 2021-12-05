@@ -55,7 +55,7 @@ class BusListForm():
 
 class BusCreateForm(forms.Form):
     plate = forms.CharField(max_length=10)
-    color = forms.CharField(max_length=6)
+    color = forms.CharField(max_length=7)
     brand = forms.CharField(max_length=50)
     model = forms.CharField(max_length=50)
     serial = forms.CharField(max_length=100)

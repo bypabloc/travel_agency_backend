@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 
                 ('plate', models.CharField(max_length=10, unique=True)),
-                ('color', models.CharField(max_length=6)),
+                ('color', models.CharField(max_length=7)),
                 ('brand', models.CharField(max_length=50)),
                 ('model', models.CharField(max_length=50)),
                 ('serial', models.CharField(max_length=100, unique=True)),

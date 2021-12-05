@@ -88,7 +88,7 @@ class BusManager(models.Manager):
 
 class Bus(models.Model):
     plate = models.CharField(max_length=10, unique=True)
-    color = models.CharField(max_length=6)
+    color = models.CharField(max_length=7)
     brand = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     serial = models.CharField(max_length=100, unique=True)
@@ -297,7 +297,7 @@ def post_migrate(sender, plan, **kwargs):
     try:
         Bus.objects.create(
             plate = 'X-123',
-            color = '000000',
+            color = '#000000',
             brand = 'Toyota',
             model = 'Corolla',
             serial = '123456789',
