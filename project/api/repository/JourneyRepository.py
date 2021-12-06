@@ -31,6 +31,7 @@ class JourneyListForm():
             "id",
             "location_origin_data",
             "location_destination_data",
+            "duration_in_seconds",
             "is_active",
             "created_at",
             "updated_at",
