@@ -22,6 +22,9 @@ class DriverListForm():
                 Q(date_of_birth__icontains=params['search']) |
                 Q(is_active__icontains=params['search'])
             )
+            drivers = drivers.filter(
+                is_active=True
+            )
         drivers = model_apply_sort(model=Driver, query=drivers, params=params)
         drivers = model_apply_pagination(query=drivers, params=params)
 

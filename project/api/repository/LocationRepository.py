@@ -18,6 +18,9 @@ class LocationListForm():
             locations = locations.filter(
                 Q(name__icontains=params['search'])
             )
+            locations = locations.filter(
+                is_active=True
+            )
         locations = model_apply_sort(model=Location, query=locations, params=params)
         locations = model_apply_pagination(query=locations, params=params)
 

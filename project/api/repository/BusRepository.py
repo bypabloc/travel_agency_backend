@@ -30,8 +30,10 @@ class BusListForm():
                 Q(color__icontains=params['search']) |
                 Q(model__icontains=params['search']) |
                 Q(serial__icontains=params['search']) |
-                Q(year__icontains=params['search']) |
-                Q(is_active__icontains=params['search'])
+                Q(year__icontains=params['search'])
+            )
+            buses = buses.filter(
+                is_active=True
             )
         buses = model_apply_sort(model=Bus, query=buses, params=params)
         buses = model_apply_pagination(query=buses, params=params)
