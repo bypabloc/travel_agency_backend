@@ -1,5 +1,5 @@
 from django import forms
-from ..models import Bus, Q
+from ..models import Bus, Driver, Q, Exists, OuterRef
 
 from .helpers import getErrorsFormatted, modelToJson
 from ..helpers.pagination import paginate_queryset
@@ -34,6 +34,10 @@ class BusListForm():
             )
             buses = buses.filter(
                 is_active=True
+            )
+            # https://stackoverflow.com/a/51879399/7100847
+            buses.filter(
+                ~Exists(Driver.objects.filter(bus_id=OuterRef('pk')))
             )
         buses = model_apply_sort(model=Bus, query=buses, params=params)
         buses = model_apply_pagination(query=buses, params=params)
