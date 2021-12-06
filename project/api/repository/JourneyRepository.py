@@ -24,6 +24,15 @@ class JourneyListForm():
         journeys = journeys.average_passengers()
 
         journeys = model_apply_filter(model=Journey, query=journeys, params=params)
+        if 'search' in params:
+            journeys = journeys.filter(
+                Q(location_origin__name__icontains=params['search']) |
+                Q(location_destination__name__icontains=params['search'])
+            )
+            journeys = journeys.filter(
+                is_active=True
+            )
+            print('journeys.query: ', journeys.query)
         journeys = model_apply_sort(model=Journey, query=journeys, params=params)
         journeys = model_apply_pagination(query=journeys, params=params)
 
