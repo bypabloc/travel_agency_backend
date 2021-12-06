@@ -124,6 +124,43 @@ class Location(models.Model):
 
 class JourneyManager(models.Manager):
     def average_passengers(self):
+
+        location_origin = Location.objects.filter(
+            location_origin=OuterRef('pk'),
+        ).values('location_origin').annotate(
+            list=JSONObject(
+                id='id',
+                name='name',
+                is_active='is_active',
+                created_at='created_at',
+                updated_at='updated_at',
+            ),
+        ).values('list')
+
+        location_destination = Location.objects.filter(
+            location_destination=OuterRef('pk'),
+        ).values('location_destination').annotate(
+            list=JSONObject(
+                id='id',
+                name='name',
+                is_active='is_active',
+                created_at='created_at',
+                updated_at='updated_at',
+            ),
+        ).values('list')
+
+        # # Query para un listado
+        # location_origin = Location.objects.filter(
+        #     location_origin=OuterRef('pk'),
+        # ).values('location_origin').annotate(
+        #     list=JSONBAgg(
+        #         JSONObject(
+        #             created_at='created_at',
+        #             updated_at='updated_at',
+        #         ),
+        #     ),
+        # ).values('list')
+
         return self.annotate(
             average_passengers=RawSQL(
                 """
@@ -137,7 +174,9 @@ class JourneyManager(models.Manager):
                     GROUP BY jd.id
                 """,
                 ()
-            )
+            ),
+            location_origin_data=Subquery(location_origin),
+            location_destination_data=Subquery(location_destination),
         )
 
     def journeys_drivers(self):

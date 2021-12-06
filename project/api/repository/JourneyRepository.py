@@ -29,8 +29,8 @@ class JourneyListForm():
 
         list = journeys['list'].all().values(
             "id",
-            "location_origin",
-            "location_destination",
+            "location_origin_data",
+            "location_destination_data",
             "is_active",
             "created_at",
             "updated_at",
@@ -38,6 +38,14 @@ class JourneyListForm():
         )
 
         journeys['list'] = list
+
+        # list = journeys['list'].all()
+
+        # list_formatted = []
+        # for item in list:
+        #     list_formatted.append(modelToJson(item))
+
+        # journeys['list'] = list_formatted
 
         return journeys
 
