@@ -1,5 +1,5 @@
 from django import forms
-from ..models import Passenger
+from ..models import Passenger, Q
 
 from .helpers import getErrorsFormatted, modelToJson
 from ..helpers.pagination import paginate_queryset
@@ -14,6 +14,16 @@ class PassengerListForm():
         passengers = Passenger.objects
 
         passengers = model_apply_filter(model=Passenger, query=passengers, params=params)
+        if 'search' in params:
+            passengers = passengers.filter(
+                Q(document__icontains=params['search']) |
+                Q(names__icontains=params['search']) |
+                Q(lastname__icontains=params['search']) |
+                Q(date_of_birth__icontains=params['search'])
+            )
+            passengers = passengers.filter(
+                is_whitelist=True
+            )
         passengers = model_apply_sort(model=Passenger, query=passengers, params=params)
         passengers = model_apply_pagination(query=passengers, params=params)
 

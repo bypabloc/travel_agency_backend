@@ -1,5 +1,5 @@
 from django import forms
-from ..models import Location
+from ..models import Location, Q
 
 from .helpers import getErrorsFormatted, modelToJson
 from ..helpers.pagination import paginate_queryset
@@ -14,6 +14,13 @@ class LocationListForm():
         locations = Location.objects
 
         locations = model_apply_filter(model=Location, query=locations, params=params)
+        if 'search' in params:
+            locations = locations.filter(
+                Q(name__icontains=params['search'])
+            )
+            locations = locations.filter(
+                is_active=True
+            )
         locations = model_apply_sort(model=Location, query=locations, params=params)
         locations = model_apply_pagination(query=locations, params=params)
 

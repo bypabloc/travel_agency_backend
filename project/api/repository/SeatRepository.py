@@ -1,5 +1,5 @@
 from django import forms
-from ..models import Seat, JourneyDriver, Ticket
+from ..models import Seat, JourneyDriver, Ticket, Q
 from django.core.validators import RegexValidator
 
 from .helpers import getErrorsFormatted, modelToJson
