@@ -1,5 +1,5 @@
 from django import forms
-from ..models import Driver, Bus
+from ..models import Driver, Bus, Q
 
 from .helpers import getErrorsFormatted, modelToJson
 from ..helpers.pagination import paginate_queryset
@@ -14,6 +14,14 @@ class DriverListForm():
         drivers = Driver.objects
 
         drivers = model_apply_filter(model=Driver, query=drivers, params=params)
+        if 'search' in params:
+            drivers = drivers.filter(
+                Q(document__icontains=params['search']) |
+                Q(names__icontains=params['search']) |
+                Q(lastname__icontains=params['search']) |
+                Q(date_of_birth__icontains=params['search']) |
+                Q(is_active__icontains=params['search'])
+            )
         drivers = model_apply_sort(model=Driver, query=drivers, params=params)
         drivers = model_apply_pagination(query=drivers, params=params)
 

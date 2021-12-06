@@ -1,5 +1,5 @@
 from django import forms
-from ..models import Passenger
+from ..models import Passenger, Q
 
 from .helpers import getErrorsFormatted, modelToJson
 from ..helpers.pagination import paginate_queryset

@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 from .helpers.date_time_without_tz_field import DateTimeWithoutTZField
 import random
 
+Q = models.Q
+
 class BusManager(models.Manager):
     def filters_custom(self, **kwargs):
 

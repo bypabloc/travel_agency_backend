@@ -1,5 +1,5 @@
 from django import forms
-from ..models import Journey, Location
+from ..models import Journey, Location, Q
 from rest_framework import serializers
 from django.core import serializers as django_serializers
 from rest_framework.renderers import JSONRenderer
@@ -24,9 +24,7 @@ class JourneyListForm():
         journeys = journeys.average_passengers()
 
         journeys = model_apply_filter(model=Journey, query=journeys, params=params)
-
         journeys = model_apply_sort(model=Journey, query=journeys, params=params)
-
         journeys = model_apply_pagination(query=journeys, params=params)
 
         list = journeys['list'].all().values(
