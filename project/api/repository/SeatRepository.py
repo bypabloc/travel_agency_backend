@@ -110,6 +110,13 @@ class SeatStateChangeForm(forms.Form):
             else:
                 self.instance = self.instance.first()
         
+        if 'active' in data:
+            if data['active'] == 1:
+                if Seat.objects.filter(
+                        is_active=1,
+                    ).count() >= 10:
+                        self.add_error('active', 'The maximum number of active seats is 10')
+        
         return data
 
     def save(self):

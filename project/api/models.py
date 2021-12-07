@@ -134,26 +134,6 @@ class LocationManager(models.Manager):
                             "api_location"."id"
                     ) > %s
                     ''', (0,)))
-        return self.aggregation(
-                where = [
-                    '''
-                    (
-                        SELECT
-                            COUNT(*)
-                        FROM
-                            "api_journey"
-                        INNER JOIN "api_journeydriver" ON "api_journeydriver"."journey_id" = "api_journey"."id"
-                        WHERE
-                            (
-                                "api_journey"."location_origin_id" = "api_location"."id" OR "api_journey"."location_destination_id" = "api_location"."id"
-                            )
-                            AND "api_journeydriver"."states" = 1
-                        GROUP BY
-                            "api_location"."id"
-                    ) > 0
-                    ''',
-                ],
-            )
 
 class Location(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -192,29 +172,64 @@ class JourneyManager(models.Manager):
             ),
         ).values('list')
 
-        # # Query para un listado
-        # location_origin = Location.objects.filter(
-        #     location_origin=OuterRef('pk'),
-        # ).values('location_origin').annotate(
-        #     list=JSONBAgg(
-        #         JSONObject(
-        #             created_at='created_at',
-        #             updated_at='updated_at',
-        #         ),
-        #     ),
-        # ).values('list')
-
         return self.annotate(
+            quantity_ticket_sold=RawSQL(
+                """
+                    (
+                        SELECT 
+                            COUNT(*)
+                        FROM 
+                            api_journeydriver AS jd
+                        RIGHT JOIN api_ticket AS ticket ON ticket.journey_driver_id = jd.id
+                        WHERE 
+                            jd.journey_id = api_journey.id 
+                        GROUP BY jd.journey_id
+                    )::NUMERIC(10,2)
+                """,
+                ()
+            ),
+            quantity_journey_driver=RawSQL(
+                """
+                    (
+                        SELECT 
+                            COUNT(*)
+                        FROM 
+                            api_journeydriver AS jd
+                        WHERE 
+                            jd.journey_id = api_journey.id 
+                        GROUP BY jd.journey_id
+                    )::NUMERIC(10,2)
+                """,
+                ()
+            ),
             average_passengers=RawSQL(
                 """
-                    SELECT 
-                        AVG (1)::NUMERIC(10,2)
-                    FROM 
-                        api_journeydriver AS jd
-                    RIGHT JOIN api_ticket AS ticket ON ticket.journey_driver_id = jd.id
-                    WHERE 
-                        jd.journey_id = api_journey.id  
-                    GROUP BY jd.id
+                    (
+                        (
+                            (
+                                SELECT 
+                                    COUNT(*)
+                                FROM 
+                                    api_journeydriver AS jd
+                                RIGHT JOIN api_ticket AS ticket ON ticket.journey_driver_id = jd.id
+                                WHERE 
+                                    jd.journey_id = api_journey.id 
+                                GROUP BY jd.journey_id
+                            )::NUMERIC(10,2)
+                        )
+                        /
+                        (
+                            (
+                                SELECT 
+                                    COUNT(*)
+                                FROM 
+                                    api_journeydriver AS jd
+                                WHERE 
+                                    jd.journey_id = api_journey.id 
+                                GROUP BY jd.journey_id
+                            )::NUMERIC(10,2)
+                        )
+                    )::NUMERIC(10,2)
                 """,
                 ()
             ),
@@ -356,6 +371,189 @@ class JourneyDriverManager(models.Manager):
                     FROM "api_seat" seat 
                     WHERE seat."is_active" = true
 	
+                """,
+                ()
+            ),
+        )
+
+        return journey_driver
+        
+    def fields_custom(self, bus=None, average_capacity_sold=None, journey=None):
+        
+        journey_driver = self 
+
+        if bus:
+            journey_driver = journey_driver.filter(
+                driver__bus_id=bus,
+            )
+
+        if journey:
+            journey_driver = journey_driver.filter(
+                journey_id=journey,
+            )
+
+        if average_capacity_sold:
+            journey_driver = journey_driver.filter(
+                states=RawSQL(
+                    """
+                        (
+                            SELECT 
+                                (
+                                    CASE
+                                        WHEN ((COUNT(*)::NUMERIC(10,2) / 10)::NUMERIC(10,2) * 100) >= %s THEN 1
+                                        ELSE 0
+                                    END
+                                ) AS "states"
+                            FROM 
+                                api_ticket AS ticket
+                            WHERE 
+                                ticket.journey_driver_id = api_journeydriver.id
+                            GROUP BY ticket.journey_driver_id
+                        )
+                    """,
+                    (average_capacity_sold,)
+                ),
+            )
+
+        journey = Journey.objects.filter(
+            journey=OuterRef('pk'),
+        ).values('journey').annotate(
+            list=JSONObject(
+                id='id',
+                location_origin=RawSQL(
+                    """
+                    (
+                        SELECT
+                            JSONB_BUILD_OBJECT(
+                                'id', location."id",
+                                'name', location."name",
+                                'created_at', location."created_at",
+                                'updated_at', location."updated_at"
+                            )
+                        FROM "api_location" location
+                        WHERE location."id" = u0.location_origin_id
+                    )
+                    """,
+                    ()
+                ),
+                location_destination=RawSQL(
+                    """
+                    (
+                        SELECT
+                            JSONB_BUILD_OBJECT(
+                                'id', location."id",
+                                'name', location."name",
+                                'created_at', location."created_at",
+                                'updated_at', location."updated_at"
+                            )
+                        FROM "api_location" location
+                        WHERE location."id" = u0.location_destination_id
+                    )
+                    """,
+                    ()
+                ),
+                duration_in_seconds='duration_in_seconds',
+                is_active='is_active',
+                created_at='created_at',
+                updated_at='updated_at',
+            ),
+        ).values('list')
+        journey_driver = journey_driver.annotate(
+            journey_data=Subquery(journey),
+        )
+
+        driver = Driver.objects.filter(
+            driver=OuterRef('pk'),
+        ).values('driver').annotate(
+            list=JSONObject(
+                id='id',
+                document='document',
+                names='names',
+                lastname='lastname',
+                date_of_birth='date_of_birth',
+                bus=RawSQL(
+                    """
+                    (
+                        SELECT
+                            JSONB_BUILD_OBJECT(
+                                'id', bus."id",
+                                'plate', bus."plate",
+                                'brand', bus."brand",
+                                'model', bus."model",
+                                'year', bus."year",
+                                'is_active', bus."is_active",
+                                'created_at', bus."created_at",
+                                'updated_at', bus."updated_at"
+                            )
+                        FROM "api_bus" bus
+                        WHERE bus."id" = u0.bus_id
+                    )
+                    """,
+                    ()
+                ),
+                is_active='is_active',
+                created_at='created_at',
+                updated_at='updated_at',
+            ),
+        ).values('list')
+        journey_driver = journey_driver.annotate(
+            driver_data=Subquery(driver),
+        )
+
+        tickets_subquery = Ticket.objects.filter(
+            journey_driver=OuterRef('pk'),
+        ).values('id').annotate(
+            list=JSONBAgg(
+                JSONObject(
+                    created_at='created_at',
+                    updated_at='updated_at',
+                ),
+            ),
+        ).values('list')
+        journey_driver = journey_driver.annotate(
+            tickets_data=Subquery(tickets_subquery),
+        )
+        print('journey_driver.query', journey_driver.query)
+
+        journey_driver = journey_driver.annotate(
+            seats=RawSQL(
+                """
+                    SELECT 
+                        JSONB_AGG(
+                            JSONB_BUILD_OBJECT(
+                                'available', (
+                                    SELECT
+                                        CASE
+                                            WHEN COUNT(*) > 0 THEN false
+                                            ELSE true
+                                        END
+                                    FROM "api_ticket" ticket
+                                    WHERE ticket.seat_id = seat."id" AND ticket.journey_driver_id = api_journeydriver.id
+                                ), 
+                                'id', seat."id", 
+                                'x', seat."seat_x", 
+                                'y', seat."seat_y"
+                            ) 
+                        ) AS "list" 
+                    FROM "api_seat" seat 
+                    WHERE seat."is_active" = true
+	
+                """,
+                ()
+            ),
+        )
+
+        journey_driver = journey_driver.annotate(
+            average_capacity_sold=RawSQL(
+                """
+                    (
+                        SELECT 
+                            (COUNT(*)::NUMERIC(10,2) / 10)::NUMERIC(10,2) * 100
+                        FROM 
+                            api_ticket AS ticket
+                        WHERE 
+                            ticket.journey_driver_id = api_journeydriver.id
+                    )::NUMERIC(10,2)
                 """,
                 ()
             ),
