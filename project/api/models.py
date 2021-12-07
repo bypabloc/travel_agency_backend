@@ -378,7 +378,7 @@ class JourneyDriverManager(models.Manager):
 
         return journey_driver
         
-    def fields_custom(self, bus=None, average_capacity_sold=None):
+    def fields_custom(self, bus=None, average_capacity_sold=None, journey=None):
         
         journey_driver = self 
 
@@ -386,6 +386,12 @@ class JourneyDriverManager(models.Manager):
             journey_driver = journey_driver.filter(
                 driver__bus_id=bus,
             )
+
+        if journey:
+            journey_driver = journey_driver.filter(
+                journey_id=journey,
+            )
+
         if average_capacity_sold:
             journey_driver = journey_driver.filter(
                 states=RawSQL(
