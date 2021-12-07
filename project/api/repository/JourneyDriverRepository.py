@@ -16,6 +16,8 @@ class JourneyDriverListForm():
     def list(self):
         params = paginate_queryset(self.request)
 
+        journeysdrivers = JourneyDriver.objects
+
         # Apply filters
         bus = None
         if 'bus' in params:
@@ -28,7 +30,8 @@ class JourneyDriverListForm():
         average_capacity_sold = None
         if 'average_capacity_sold' in params:
             average_capacity_sold = params['average_capacity_sold']
-        journeysdrivers = JourneyDriver.objects.fields_custom(bus=bus, average_capacity_sold=average_capacity_sold, journey=journey)
+
+        journeysdrivers = journeysdrivers.fields_custom(bus=bus, average_capacity_sold=average_capacity_sold, journey=journey)
 
         journeysdrivers = model_apply_filter(model=JourneyDriver, query=journeysdrivers, params=params)
         journeysdrivers = model_apply_sort(model=JourneyDriver, query=journeysdrivers, params=params)
@@ -44,6 +47,8 @@ class JourneyDriverListForm():
 
             "created_at",
             "updated_at",
+            
+            'average_capacity_sold',
         ]
         if average_capacity_sold is not None:
             values.append('average_capacity_sold')

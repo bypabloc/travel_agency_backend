@@ -42,6 +42,7 @@ class BusListForm():
                 buses = buses.filter(
                     ~Exists(Driver.objects.filter(bus_id=OuterRef('pk')))
                 )
+                
         buses = model_apply_sort(model=Bus, query=buses, params=params)
         buses = model_apply_pagination(query=buses, params=params)
 
