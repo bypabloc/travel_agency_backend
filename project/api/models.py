@@ -384,7 +384,7 @@ class JourneyDriverManager(models.Manager):
 
         if bus:
             journey_driver = journey_driver.filter(
-                journey__bus_id=bus,
+                driver__bus_id=bus,
             )
         if average_capacity_sold:
             journey_driver = journey_driver.filter(
@@ -414,6 +414,38 @@ class JourneyDriverManager(models.Manager):
         ).values('journey').annotate(
             list=JSONObject(
                 id='id',
+                location_origin=RawSQL(
+                    """
+                    (
+                        SELECT
+                            JSONB_BUILD_OBJECT(
+                                'id', location."id",
+                                'name', location."name",
+                                'created_at', location."created_at",
+                                'updated_at', location."updated_at"
+                            )
+                        FROM "api_location" location
+                        WHERE location."id" = u0.location_origin_id
+                    )
+                    """,
+                    ()
+                ),
+                location_destination=RawSQL(
+                    """
+                    (
+                        SELECT
+                            JSONB_BUILD_OBJECT(
+                                'id', location."id",
+                                'name', location."name",
+                                'created_at', location."created_at",
+                                'updated_at', location."updated_at"
+                            )
+                        FROM "api_location" location
+                        WHERE location."id" = u0.location_destination_id
+                    )
+                    """,
+                    ()
+                ),
                 duration_in_seconds='duration_in_seconds',
                 is_active='is_active',
                 created_at='created_at',
@@ -433,6 +465,26 @@ class JourneyDriverManager(models.Manager):
                 names='names',
                 lastname='lastname',
                 date_of_birth='date_of_birth',
+                bus=RawSQL(
+                    """
+                    (
+                        SELECT
+                            JSONB_BUILD_OBJECT(
+                                'id', bus."id",
+                                'plate', bus."plate",
+                                'brand', bus."brand",
+                                'model', bus."model",
+                                'year', bus."year",
+                                'is_active', bus."is_active",
+                                'created_at', bus."created_at",
+                                'updated_at', bus."updated_at"
+                            )
+                        FROM "api_bus" bus
+                        WHERE bus."id" = u0.bus_id
+                    )
+                    """,
+                    ()
+                ),
                 is_active='is_active',
                 created_at='created_at',
                 updated_at='updated_at',
