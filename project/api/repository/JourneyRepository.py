@@ -32,7 +32,7 @@ class JourneyListForm():
             journeys = journeys.filter(
                 is_active=True
             )
-            print('journeys.query: ', journeys.query)
+
         journeys = model_apply_sort(model=Journey, query=journeys, params=params)
         journeys = model_apply_pagination(query=journeys, params=params)
 

@@ -12,6 +12,10 @@ class LocationListForm():
         params = paginate_queryset(self.request)
 
         locations = Location.objects
+        
+        if 'available' in params:
+            locations = locations.available()
+            print('locations.query: ', locations.query)
 
         locations = model_apply_filter(model=Location, query=locations, params=params)
         if 'search' in params:
@@ -21,6 +25,7 @@ class LocationListForm():
             locations = locations.filter(
                 is_active=True
             )
+
         locations = model_apply_sort(model=Location, query=locations, params=params)
         locations = model_apply_pagination(query=locations, params=params)
 

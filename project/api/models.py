@@ -6,6 +6,7 @@ from django.contrib.postgres.aggregates.general import JSONBAgg
 from django.db.models.signals import pre_save, pre_migrate, post_migrate
 from django.dispatch import receiver
 from datetime import datetime, timedelta
+
 from .helpers.date_time_without_tz_field import DateTimeWithoutTZField
 import random
 
@@ -115,12 +116,54 @@ class Driver(models.Model):
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
 
+class LocationManager(models.Manager):
+    def available(self):
+        return self.filter(is_active__gte=RawSQL('''
+                    (
+                        SELECT
+                            COUNT(*) AS "is_active"
+                        FROM
+                            "api_journey"
+                        INNER JOIN "api_journeydriver" ON "api_journeydriver"."journey_id" = "api_journey"."id"
+                        WHERE
+                            (
+                                "api_journey"."location_origin_id" = "api_location"."id" OR "api_journey"."location_destination_id" = "api_location"."id"
+                            )
+                            AND "api_journeydriver"."states" = 1
+                        GROUP BY
+                            "api_location"."id"
+                    ) > %s
+                    ''', (0,)))
+        return self.aggregation(
+                where = [
+                    '''
+                    (
+                        SELECT
+                            COUNT(*)
+                        FROM
+                            "api_journey"
+                        INNER JOIN "api_journeydriver" ON "api_journeydriver"."journey_id" = "api_journey"."id"
+                        WHERE
+                            (
+                                "api_journey"."location_origin_id" = "api_location"."id" OR "api_journey"."location_destination_id" = "api_location"."id"
+                            )
+                            AND "api_journeydriver"."states" = 1
+                        GROUP BY
+                            "api_location"."id"
+                    ) > 0
+                    ''',
+                ],
+            )
+
 class Location(models.Model):
     name = models.CharField(max_length=50, unique=True)
     is_active = models.BooleanField(default=True)
 
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
+
+    objects = LocationManager()
+
 
 class JourneyManager(models.Manager):
     def average_passengers(self):
