@@ -44,6 +44,8 @@ class JourneyListForm():
             "is_active",
             "created_at",
             "updated_at",
+            'quantity_journey_driver',
+            'quantity_ticket_sold',
             'average_passengers',
         )
 

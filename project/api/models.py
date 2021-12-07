@@ -205,16 +205,63 @@ class JourneyManager(models.Manager):
         # ).values('list')
 
         return self.annotate(
+            quantity_ticket_sold=RawSQL(
+                """
+                    (
+                        SELECT 
+                            COUNT(*)
+                        FROM 
+                            api_journeydriver AS jd
+                        RIGHT JOIN api_ticket AS ticket ON ticket.journey_driver_id = jd.id
+                        WHERE 
+                            jd.journey_id = api_journey.id 
+                        GROUP BY jd.journey_id
+                    )::NUMERIC(10,2)
+                """,
+                ()
+            ),
+            quantity_journey_driver=RawSQL(
+                """
+                    (
+                        SELECT 
+                            COUNT(*)
+                        FROM 
+                            api_journeydriver AS jd
+                        WHERE 
+                            jd.journey_id = api_journey.id 
+                        GROUP BY jd.journey_id
+                    )::NUMERIC(10,2)
+                """,
+                ()
+            ),
             average_passengers=RawSQL(
                 """
-                    SELECT 
-                        AVG (1)::NUMERIC(10,2)
-                    FROM 
-                        api_journeydriver AS jd
-                    RIGHT JOIN api_ticket AS ticket ON ticket.journey_driver_id = jd.id
-                    WHERE 
-                        jd.journey_id = api_journey.id  
-                    GROUP BY jd.id
+                    (
+                        (
+                            (
+                                SELECT 
+                                    COUNT(*)
+                                FROM 
+                                    api_journeydriver AS jd
+                                RIGHT JOIN api_ticket AS ticket ON ticket.journey_driver_id = jd.id
+                                WHERE 
+                                    jd.journey_id = api_journey.id 
+                                GROUP BY jd.journey_id
+                            )::NUMERIC(10,2)
+                        )
+                        /
+                        (
+                            (
+                                SELECT 
+                                    COUNT(*)
+                                FROM 
+                                    api_journeydriver AS jd
+                                WHERE 
+                                    jd.journey_id = api_journey.id 
+                                GROUP BY jd.journey_id
+                            )::NUMERIC(10,2)
+                        )
+                    )::NUMERIC(10,2)
                 """,
                 ()
             ),
