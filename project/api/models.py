@@ -333,6 +333,34 @@ class JourneyDriverManager(models.Manager):
         )
         print('journey_driver.query', journey_driver.query)
 
+        journey_driver = journey_driver.annotate(
+            seats=RawSQL(
+                """
+                    SELECT 
+                        JSONB_AGG(
+                            JSONB_BUILD_OBJECT(
+                                'available', (
+                                    SELECT
+                                        CASE
+                                            WHEN COUNT(*) > 0 THEN false
+                                            ELSE true
+                                        END
+                                    FROM "api_ticket" ticket
+                                    WHERE ticket.seat_id = seat."id" AND ticket.journey_driver_id = api_journeydriver.id
+                                ), 
+                                'id', seat."id", 
+                                'seat_x', seat."seat_x", 
+                                'seat_y', seat."seat_y"
+                            ) 
+                        ) AS "list" 
+                    FROM "api_seat" seat 
+                    WHERE seat."is_active" = true
+	
+                """,
+                ()
+            ),
+        )
+
         return journey_driver
         
 

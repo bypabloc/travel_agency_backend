@@ -1,6 +1,8 @@
 from django import forms
 from datetime import datetime, timedelta
 
+import json
+
 from ..models import Journey, JourneyDriver, Driver, Q
 
 from .helpers import getErrorsFormatted, modelToJson
@@ -292,11 +294,14 @@ class JourneyDriverJourneysForm():
 
             "journey_data",
             "driver_data",
-            'tickets_data',
+            'seats',
 
             "created_at",
             "updated_at",
         )
+
+        for journeydriver in list:
+            journeydriver['seats'] = json.loads(journeydriver['seats'])
 
         journeysdrivers['list'] = list
 
