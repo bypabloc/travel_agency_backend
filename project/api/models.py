@@ -265,9 +265,9 @@ class Passenger(models.Model):
     updated_at = DateTimeWithoutTZField(null=True)
 
 class JourneyDriverManager(models.Manager):
-    def journeys(self, location_origin, location_destination, date_start, date_end, tz_in_minutes=0):
+    def availables(self, location_origin, location_destination, date_start, date_end, tz_in_minutes=0):
 
-        return self.filter(
+        journey_driver = self.filter(
             journey__location_origin_id=location_origin,
             journey__location_destination_id=location_destination,
             # datetime_start__gte=date_start,
@@ -284,6 +284,57 @@ class JourneyDriverManager(models.Manager):
                 date_end,
             ],
         )
+
+        journey = Journey.objects.filter(
+            journey=OuterRef('pk'),
+        ).values('journey').annotate(
+            list=JSONObject(
+                id='id',
+                duration_in_seconds='duration_in_seconds',
+                is_active='is_active',
+                created_at='created_at',
+                updated_at='updated_at',
+            ),
+        ).values('list')
+        journey_driver = journey_driver.annotate(
+            journey_data=Subquery(journey),
+        )
+
+        driver = Driver.objects.filter(
+            driver=OuterRef('pk'),
+        ).values('driver').annotate(
+            list=JSONObject(
+                id='id',
+                document='document',
+                names='names',
+                lastname='lastname',
+                date_of_birth='date_of_birth',
+                is_active='is_active',
+                created_at='created_at',
+                updated_at='updated_at',
+            ),
+        ).values('list')
+        journey_driver = journey_driver.annotate(
+            driver_data=Subquery(driver),
+        )
+
+        tickets_subquery = Ticket.objects.filter(
+            journey_driver=OuterRef('pk'),
+        ).values('id').annotate(
+            list=JSONBAgg(
+                JSONObject(
+                    created_at='created_at',
+                    updated_at='updated_at',
+                ),
+            ),
+        ).values('list')
+        journey_driver = journey_driver.annotate(
+            tickets_data=Subquery(tickets_subquery),
+        )
+        print('journey_driver.query', journey_driver.query)
+
+        return journey_driver
+        
 
 class JourneyDriver(models.Model):
     datetime_start = DateTimeWithoutTZField(null=True)

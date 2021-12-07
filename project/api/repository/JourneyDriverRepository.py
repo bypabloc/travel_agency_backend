@@ -273,7 +273,7 @@ class JourneyDriverJourneysForm():
         date_start = self.cleaned_data['date_start']
         date_end = self.cleaned_data['date_end']
 
-        journeysdrivers = JourneyDriver.objects.journeys(
+        journeysdrivers = JourneyDriver.objects.availables(
             location_origin=location_origin,
             location_destination=location_destination,
             tz_in_minutes=tz_in_minutes,
@@ -285,13 +285,20 @@ class JourneyDriverJourneysForm():
         journeysdrivers = model_apply_sort(model=JourneyDriver, query=journeysdrivers, params=params)
         journeysdrivers = model_apply_pagination(query=journeysdrivers, params=params)
 
-        list = journeysdrivers['list'].all()
+        list = journeysdrivers['list'].all().values(
+            "id",
+            "datetime_start",
+            "states",
 
-        list_formatted = []
-        for item in list:
-            list_formatted.append(modelToJson(item))
+            "journey_data",
+            "driver_data",
+            'tickets_data',
 
-        journeysdrivers['list'] = list_formatted
+            "created_at",
+            "updated_at",
+        )
+
+        journeysdrivers['list'] = list
 
         return journeysdrivers
 
