@@ -36,7 +36,7 @@ class BusListForm():
                 is_active=True
             )
             # https://stackoverflow.com/a/51879399/7100847
-            buses.filter(
+            buses = buses.filter(
                 ~Exists(Driver.objects.filter(bus_id=OuterRef('pk')))
             )
         buses = model_apply_sort(model=Bus, query=buses, params=params)

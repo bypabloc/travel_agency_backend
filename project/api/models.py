@@ -6,6 +6,7 @@ from django.contrib.postgres.aggregates.general import JSONBAgg
 from django.db.models.signals import pre_save, pre_migrate, post_migrate
 from django.dispatch import receiver
 from datetime import datetime, timedelta
+
 from .helpers.date_time_without_tz_field import DateTimeWithoutTZField
 import random
 
@@ -115,6 +116,45 @@ class Driver(models.Model):
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
 
+class LocationManager(models.Manager):
+    def available(self):
+        return self.filter(is_active__gte=RawSQL('''
+                    (
+                        SELECT
+                            COUNT(*) AS "is_active"
+                        FROM
+                            "api_journey"
+                        INNER JOIN "api_journeydriver" ON "api_journeydriver"."journey_id" = "api_journey"."id"
+                        WHERE
+                            (
+                                "api_journey"."location_origin_id" = "api_location"."id" OR "api_journey"."location_destination_id" = "api_location"."id"
+                            )
+                            AND "api_journeydriver"."states" = 1
+                        GROUP BY
+                            "api_location"."id"
+                    ) > %s
+                    ''', (0,)))
+        return self.aggregation(
+                where = [
+                    '''
+                    (
+                        SELECT
+                            COUNT(*)
+                        FROM
+                            "api_journey"
+                        INNER JOIN "api_journeydriver" ON "api_journeydriver"."journey_id" = "api_journey"."id"
+                        WHERE
+                            (
+                                "api_journey"."location_origin_id" = "api_location"."id" OR "api_journey"."location_destination_id" = "api_location"."id"
+                            )
+                            AND "api_journeydriver"."states" = 1
+                        GROUP BY
+                            "api_location"."id"
+                    ) > 0
+                    ''',
+                ],
+            )
+
 class Location(models.Model):
     name = models.CharField(max_length=50, unique=True)
     is_active = models.BooleanField(default=True)
@@ -122,8 +162,48 @@ class Location(models.Model):
     created_at = DateTimeWithoutTZField(null=True)
     updated_at = DateTimeWithoutTZField(null=True)
 
+    objects = LocationManager()
+
+
 class JourneyManager(models.Manager):
     def average_passengers(self):
+
+        location_origin = Location.objects.filter(
+            location_origin=OuterRef('pk'),
+        ).values('location_origin').annotate(
+            list=JSONObject(
+                id='id',
+                name='name',
+                is_active='is_active',
+                created_at='created_at',
+                updated_at='updated_at',
+            ),
+        ).values('list')
+
+        location_destination = Location.objects.filter(
+            location_destination=OuterRef('pk'),
+        ).values('location_destination').annotate(
+            list=JSONObject(
+                id='id',
+                name='name',
+                is_active='is_active',
+                created_at='created_at',
+                updated_at='updated_at',
+            ),
+        ).values('list')
+
+        # # Query para un listado
+        # location_origin = Location.objects.filter(
+        #     location_origin=OuterRef('pk'),
+        # ).values('location_origin').annotate(
+        #     list=JSONBAgg(
+        #         JSONObject(
+        #             created_at='created_at',
+        #             updated_at='updated_at',
+        #         ),
+        #     ),
+        # ).values('list')
+
         return self.annotate(
             average_passengers=RawSQL(
                 """
@@ -137,7 +217,9 @@ class JourneyManager(models.Manager):
                     GROUP BY jd.id
                 """,
                 ()
-            )
+            ),
+            location_origin_data=Subquery(location_origin),
+            location_destination_data=Subquery(location_destination),
         )
 
     def journeys_drivers(self):
@@ -183,9 +265,9 @@ class Passenger(models.Model):
     updated_at = DateTimeWithoutTZField(null=True)
 
 class JourneyDriverManager(models.Manager):
-    def journeys(self, location_origin, location_destination, date_start, date_end, tz_in_minutes=0):
+    def availables(self, location_origin, location_destination, date_start, date_end, tz_in_minutes=0):
 
-        return self.filter(
+        journey_driver = self.filter(
             journey__location_origin_id=location_origin,
             journey__location_destination_id=location_destination,
             # datetime_start__gte=date_start,
@@ -202,6 +284,85 @@ class JourneyDriverManager(models.Manager):
                 date_end,
             ],
         )
+
+        journey = Journey.objects.filter(
+            journey=OuterRef('pk'),
+        ).values('journey').annotate(
+            list=JSONObject(
+                id='id',
+                duration_in_seconds='duration_in_seconds',
+                is_active='is_active',
+                created_at='created_at',
+                updated_at='updated_at',
+            ),
+        ).values('list')
+        journey_driver = journey_driver.annotate(
+            journey_data=Subquery(journey),
+        )
+
+        driver = Driver.objects.filter(
+            driver=OuterRef('pk'),
+        ).values('driver').annotate(
+            list=JSONObject(
+                id='id',
+                document='document',
+                names='names',
+                lastname='lastname',
+                date_of_birth='date_of_birth',
+                is_active='is_active',
+                created_at='created_at',
+                updated_at='updated_at',
+            ),
+        ).values('list')
+        journey_driver = journey_driver.annotate(
+            driver_data=Subquery(driver),
+        )
+
+        tickets_subquery = Ticket.objects.filter(
+            journey_driver=OuterRef('pk'),
+        ).values('id').annotate(
+            list=JSONBAgg(
+                JSONObject(
+                    created_at='created_at',
+                    updated_at='updated_at',
+                ),
+            ),
+        ).values('list')
+        journey_driver = journey_driver.annotate(
+            tickets_data=Subquery(tickets_subquery),
+        )
+        print('journey_driver.query', journey_driver.query)
+
+        journey_driver = journey_driver.annotate(
+            seats=RawSQL(
+                """
+                    SELECT 
+                        JSONB_AGG(
+                            JSONB_BUILD_OBJECT(
+                                'available', (
+                                    SELECT
+                                        CASE
+                                            WHEN COUNT(*) > 0 THEN false
+                                            ELSE true
+                                        END
+                                    FROM "api_ticket" ticket
+                                    WHERE ticket.seat_id = seat."id" AND ticket.journey_driver_id = api_journeydriver.id
+                                ), 
+                                'id', seat."id", 
+                                'x', seat."seat_x", 
+                                'y', seat."seat_y"
+                            ) 
+                        ) AS "list" 
+                    FROM "api_seat" seat 
+                    WHERE seat."is_active" = true
+	
+                """,
+                ()
+            ),
+        )
+
+        return journey_driver
+        
 
 class JourneyDriver(models.Model):
     datetime_start = DateTimeWithoutTZField(null=True)

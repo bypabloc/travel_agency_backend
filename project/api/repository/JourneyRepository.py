@@ -24,13 +24,23 @@ class JourneyListForm():
         journeys = journeys.average_passengers()
 
         journeys = model_apply_filter(model=Journey, query=journeys, params=params)
+        if 'search' in params:
+            journeys = journeys.filter(
+                Q(location_origin__name__icontains=params['search']) |
+                Q(location_destination__name__icontains=params['search'])
+            )
+            journeys = journeys.filter(
+                is_active=True
+            )
+
         journeys = model_apply_sort(model=Journey, query=journeys, params=params)
         journeys = model_apply_pagination(query=journeys, params=params)
 
         list = journeys['list'].all().values(
             "id",
-            "location_origin",
-            "location_destination",
+            "location_origin_data",
+            "location_destination_data",
+            "duration_in_seconds",
             "is_active",
             "created_at",
             "updated_at",
@@ -38,6 +48,14 @@ class JourneyListForm():
         )
 
         journeys['list'] = list
+
+        # list = journeys['list'].all()
+
+        # list_formatted = []
+        # for item in list:
+        #     list_formatted.append(modelToJson(item))
+
+        # journeys['list'] = list_formatted
 
         return journeys
 
