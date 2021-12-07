@@ -16,19 +16,37 @@ class JourneyDriverListForm():
     def list(self):
         params = paginate_queryset(self.request)
 
-        journeysdrivers = JourneyDriver.objects
+        # Apply filters
+        bus = None
+        if 'bus' in params:
+            bus = params['bus']
+        bus = None
+        if 'average_capacity_sold' in params:
+            average_capacity_sold = params['average_capacity_sold']
+        journeysdrivers = JourneyDriver.objects.fields_custom(bus=bus, average_capacity_sold=average_capacity_sold)
 
         journeysdrivers = model_apply_filter(model=JourneyDriver, query=journeysdrivers, params=params)
         journeysdrivers = model_apply_sort(model=JourneyDriver, query=journeysdrivers, params=params)
         journeysdrivers = model_apply_pagination(query=journeysdrivers, params=params)
 
-        list = journeysdrivers['list'].all()
+        list = journeysdrivers['list'].all().values(
+            "id",
+            "datetime_start",
+            "states",
 
-        list_formatted = []
-        for item in list:
-            list_formatted.append(modelToJson(item))
+            "journey_data",
+            "driver_data",
+            'average_capacity_sold',
 
-        journeysdrivers['list'] = list_formatted
+            "created_at",
+            "updated_at",
+        )
+
+        for journeydriver in list:
+            pass
+            # journeydriver['seats'] = json.loads(journeydriver['seats'])
+
+        journeysdrivers['list'] = list
 
         return journeysdrivers
 
