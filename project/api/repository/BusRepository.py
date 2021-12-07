@@ -28,6 +28,7 @@ class BusListForm():
             buses = buses.filter(
                 Q(plate__icontains=params['search']) |
                 Q(color__icontains=params['search']) |
+                Q(brand__icontains=params['search']) |
                 Q(model__icontains=params['search']) |
                 Q(serial__icontains=params['search']) |
                 Q(year__icontains=params['search'])
@@ -35,10 +36,12 @@ class BusListForm():
             buses = buses.filter(
                 is_active=True
             )
-            # https://stackoverflow.com/a/51879399/7100847
-            buses = buses.filter(
-                ~Exists(Driver.objects.filter(bus_id=OuterRef('pk')))
-            )
+
+            if 'unique_in_drivers' in params:
+                # https://stackoverflow.com/a/51879399/7100847
+                buses = buses.filter(
+                    ~Exists(Driver.objects.filter(bus_id=OuterRef('pk')))
+                )
         buses = model_apply_sort(model=Bus, query=buses, params=params)
         buses = model_apply_pagination(query=buses, params=params)
 
