@@ -349,8 +349,8 @@ class JourneyDriverManager(models.Manager):
                                     WHERE ticket.seat_id = seat."id" AND ticket.journey_driver_id = api_journeydriver.id
                                 ), 
                                 'id', seat."id", 
-                                'seat_x', seat."seat_x", 
-                                'seat_y', seat."seat_y"
+                                'x', seat."seat_x", 
+                                'y', seat."seat_y"
                             ) 
                         ) AS "list" 
                     FROM "api_seat" seat 
