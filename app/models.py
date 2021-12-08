@@ -31,19 +31,19 @@ class BusManager(models.Manager):
                         SELECT
                             COUNT(*)
                         FROM
-                            "api_driver"
-                        INNER JOIN "api_journeydriver" ON "api_journeydriver"."driver_id" = "api_driver"."id"
-                        INNER JOIN "api_ticket" ON "api_ticket"."journey_driver_id" = "api_journeydriver"."id"
+                            "app_driver"
+                        INNER JOIN "app_journeydriver" ON "app_journeydriver"."driver_id" = "app_driver"."id"
+                        INNER JOIN "app_ticket" ON "app_ticket"."journey_driver_id" = "app_journeydriver"."id"
                         WHERE
-                            "api_driver"."bus_id" = "api_bus"."id"
+                            "app_driver"."bus_id" = "app_bus"."id"
                         GROUP BY
-                            "api_driver"."bus_id"
+                            "app_driver"."bus_id"
                     )
                     / 
                     (
                         SELECT
                             COUNT(*)
-                        FROM "api_seat" seat
+                        FROM "app_seat" seat
                         WHERE seat."is_active" = true
                     )
                     > %s
@@ -59,19 +59,19 @@ class BusManager(models.Manager):
                             SELECT
                                 COUNT(*)
                             FROM
-                                "api_driver"
-                            INNER JOIN "api_journeydriver" ON "api_journeydriver"."driver_id" = "api_driver"."id"
-                            INNER JOIN "api_ticket" ON "api_ticket"."journey_driver_id" = "api_journeydriver"."id"
+                                "app_driver"
+                            INNER JOIN "app_journeydriver" ON "app_journeydriver"."driver_id" = "app_driver"."id"
+                            INNER JOIN "app_ticket" ON "app_ticket"."journey_driver_id" = "app_journeydriver"."id"
                             WHERE
-                                "api_driver"."bus_id" = "api_bus"."id"
+                                "app_driver"."bus_id" = "app_bus"."id"
                             GROUP BY
-                                "api_driver"."bus_id"
+                                "app_driver"."bus_id"
                         )
                         /
                         (
                             SELECT
                                 COUNT(*)
-                            FROM "api_seat" seat
+                            FROM "app_seat" seat
                             WHERE seat."is_active" = true
                         )
                     """,
@@ -91,11 +91,11 @@ class BusManager(models.Manager):
                                 ELSE FALSE
                             END
                         FROM 
-                            "api_driver"
-                        INNER JOIN "api_journeydriver" ON "api_journeydriver"."driver_id" = "api_driver"."id"
+                            "app_driver"
+                        INNER JOIN "app_journeydriver" ON "app_journeydriver"."driver_id" = "app_driver"."id"
                         WHERE
-                            "api_driver"."bus_id" = "api_bus"."id"
-                            AND "api_journeydriver"."journey_id" = %s
+                            "app_driver"."bus_id" = "app_bus"."id"
+                            AND "app_journeydriver"."journey_id" = %s
                         LIMIT 1
                     ''',
                 ],
@@ -138,15 +138,15 @@ class LocationManager(models.Manager):
                         SELECT
                             COUNT(*) AS "is_active"
                         FROM
-                            "api_journey"
-                        INNER JOIN "api_journeydriver" ON "api_journeydriver"."journey_id" = "api_journey"."id"
+                            "app_journey"
+                        INNER JOIN "app_journeydriver" ON "app_journeydriver"."journey_id" = "app_journey"."id"
                         WHERE
                             (
-                                "api_journey"."location_origin_id" = "api_location"."id" OR "api_journey"."location_destination_id" = "api_location"."id"
+                                "app_journey"."location_origin_id" = "app_location"."id" OR "app_journey"."location_destination_id" = "app_location"."id"
                             )
-                            AND "api_journeydriver"."states" = 1
+                            AND "app_journeydriver"."states" = 1
                         GROUP BY
-                            "api_location"."id"
+                            "app_location"."id"
                     ) > %s
                     ''', (0,)))
 
@@ -194,10 +194,10 @@ class JourneyManager(models.Manager):
                         SELECT 
                             COUNT(*)
                         FROM 
-                            api_journeydriver AS jd
-                        RIGHT JOIN api_ticket AS ticket ON ticket.journey_driver_id = jd.id
+                            app_journeydriver AS jd
+                        RIGHT JOIN app_ticket AS ticket ON ticket.journey_driver_id = jd.id
                         WHERE 
-                            jd.journey_id = api_journey.id 
+                            jd.journey_id = app_journey.id 
                         GROUP BY jd.journey_id
                     )::NUMERIC(10,2)
                 """,
@@ -209,9 +209,9 @@ class JourneyManager(models.Manager):
                         SELECT 
                             COUNT(*)
                         FROM 
-                            api_journeydriver AS jd
+                            app_journeydriver AS jd
                         WHERE 
-                            jd.journey_id = api_journey.id 
+                            jd.journey_id = app_journey.id 
                         GROUP BY jd.journey_id
                     )::NUMERIC(10,2)
                 """,
@@ -225,10 +225,10 @@ class JourneyManager(models.Manager):
                                 SELECT 
                                     COUNT(*)
                                 FROM 
-                                    api_journeydriver AS jd
-                                RIGHT JOIN api_ticket AS ticket ON ticket.journey_driver_id = jd.id
+                                    app_journeydriver AS jd
+                                RIGHT JOIN app_ticket AS ticket ON ticket.journey_driver_id = jd.id
                                 WHERE 
-                                    jd.journey_id = api_journey.id 
+                                    jd.journey_id = app_journey.id 
                                 GROUP BY jd.journey_id
                             )::NUMERIC(10,2)
                         )
@@ -238,9 +238,9 @@ class JourneyManager(models.Manager):
                                 SELECT 
                                     COUNT(*)
                                 FROM 
-                                    api_journeydriver AS jd
+                                    app_journeydriver AS jd
                                 WHERE 
-                                    jd.journey_id = api_journey.id 
+                                    jd.journey_id = app_journey.id 
                                 GROUP BY jd.journey_id
                             )::NUMERIC(10,2)
                         )
@@ -375,15 +375,15 @@ class JourneyDriverManager(models.Manager):
                                             WHEN COUNT(*) > 0 THEN false
                                             ELSE true
                                         END
-                                    FROM "api_ticket" ticket
-                                    WHERE ticket.seat_id = seat."id" AND ticket.journey_driver_id = api_journeydriver.id
+                                    FROM "app_ticket" ticket
+                                    WHERE ticket.seat_id = seat."id" AND ticket.journey_driver_id = app_journeydriver.id
                                 ), 
                                 'id', seat."id", 
                                 'x', seat."seat_x", 
                                 'y', seat."seat_y"
                             ) 
                         ) AS "list" 
-                    FROM "api_seat" seat 
+                    FROM "app_seat" seat 
                     WHERE seat."is_active" = true
 	
                 """,
@@ -420,16 +420,16 @@ class JourneyDriverManager(models.Manager):
                                                 SELECT 
                                                     COUNT(*)
                                                 FROM 
-                                                    api_ticket AS ticket
+                                                    app_ticket AS ticket
                                                 WHERE 
-                                                    ticket.journey_driver_id = api_journeydriver.id
+                                                    ticket.journey_driver_id = app_journeydriver.id
                                                 GROUP BY ticket.journey_driver_id
                                             )::NUMERIC(10,2)
                                             /
                                             (
                                                 SELECT
                                                     COUNT(*)
-                                                FROM "api_seat" seat
+                                                FROM "app_seat" seat
                                                 WHERE seat."is_active" = true
                                             )::NUMERIC(10,2)
                                         )::NUMERIC(10,2)
@@ -459,7 +459,7 @@ class JourneyDriverManager(models.Manager):
                                 'created_at', location."created_at",
                                 'updated_at', location."updated_at"
                             )
-                        FROM "api_location" location
+                        FROM "app_location" location
                         WHERE location."id" = u0.location_origin_id
                     )
                     """,
@@ -475,7 +475,7 @@ class JourneyDriverManager(models.Manager):
                                 'created_at', location."created_at",
                                 'updated_at', location."updated_at"
                             )
-                        FROM "api_location" location
+                        FROM "app_location" location
                         WHERE location."id" = u0.location_destination_id
                     )
                     """,
@@ -514,7 +514,7 @@ class JourneyDriverManager(models.Manager):
                                 'created_at', bus."created_at",
                                 'updated_at', bus."updated_at"
                             )
-                        FROM "api_bus" bus
+                        FROM "app_bus" bus
                         WHERE bus."id" = u0.bus_id
                     )
                     """,
@@ -556,15 +556,15 @@ class JourneyDriverManager(models.Manager):
                                             WHEN COUNT(*) > 0 THEN false
                                             ELSE true
                                         END
-                                    FROM "api_ticket" ticket
-                                    WHERE ticket.seat_id = seat."id" AND ticket.journey_driver_id = api_journeydriver.id
+                                    FROM "app_ticket" ticket
+                                    WHERE ticket.seat_id = seat."id" AND ticket.journey_driver_id = app_journeydriver.id
                                 ), 
                                 'id', seat."id", 
                                 'x', seat."seat_x", 
                                 'y', seat."seat_y"
                             ) 
                         ) AS "list" 
-                    FROM "api_seat" seat 
+                    FROM "app_seat" seat 
                     WHERE seat."is_active" = true
 	
                 """,
@@ -581,16 +581,16 @@ class JourneyDriverManager(models.Manager):
                                 SELECT 
                                     COUNT(*)
                                 FROM 
-                                    api_ticket AS ticket
+                                    app_ticket AS ticket
                                 WHERE 
-                                    ticket.journey_driver_id = api_journeydriver.id
+                                    ticket.journey_driver_id = app_journeydriver.id
                                 GROUP BY ticket.journey_driver_id
                             )::NUMERIC(10,2)
                             /
                             (
                                 SELECT
                                     COUNT(*)
-                                FROM "api_seat" seat
+                                FROM "app_seat" seat
                                 WHERE seat."is_active" = true
                             )::NUMERIC(10,2)
                         )::NUMERIC(10,2)

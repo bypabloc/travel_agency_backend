@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+
+django = "==3.2.9"
+djangorestframework = "==3.12.4"
+django-model-utils = "==4.2.0"
+postgres = "==4.0"
+python-dotenv = "==0.19.2"
+django-cors-headers = "==3.10.0"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"

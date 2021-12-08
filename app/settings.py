@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api',
+    'app',
     'corsheaders',
     'rest_framework',
 ]
@@ -80,7 +80,7 @@ CORS_ALLOW_METHODS = [
     "POST",
 ]
 
-ROOT_URLCONF = 'project.urls'
+ROOT_URLCONF = 'app.urls'
 
 TEMPLATES = [
     {
@@ -98,7 +98,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'project.wsgi.application'
+WSGI_APPLICATION = 'app.wsgi.application'
 
 
 # Database

@@ -4,36 +4,30 @@ from ..helpers.date_time_without_tz_field import DateTimeWithoutTZField
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0007_passengers'),
+        ('app', '0004_journeys'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Ticket',
+            name='JourneyDriver',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
 
+                ('datetime_start', DateTimeWithoutTZField()),
                 ('states', models.PositiveSmallIntegerField()),
 
                 (
-                    'passenger',
+                    'journey',
                     models.ForeignKey(
                         on_delete=models.deletion.DO_NOTHING,
-                        to='api.Passenger',
+                        to='app.Journey',
                     ),
                 ),
                 (
-                    'journey_driver',
+                    'driver',
                     models.ForeignKey(
                         on_delete=models.deletion.DO_NOTHING,
-                        to='api.JourneyDriver',
-                    ),
-                ),
-                (
-                    'seat',
-                    models.ForeignKey(
-                        on_delete=models.deletion.DO_NOTHING,
-                        to='api.Seat',
+                        to='app.Driver',
                     ),
                 ),
                 
