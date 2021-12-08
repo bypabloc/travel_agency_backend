@@ -4,7 +4,7 @@ from ..helpers.date_time_without_tz_field import DateTimeWithoutTZField
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0001_buses'),
+        ('app', '0001_buses'),
     ]
 
     operations = [
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                     'bus',
                     models.ForeignKey(
                         on_delete=models.deletion.DO_NOTHING,
-                        to='api.Bus',
+                        to='app.Bus',
                     ),
                 ),
 
