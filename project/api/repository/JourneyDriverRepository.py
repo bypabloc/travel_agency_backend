@@ -47,7 +47,7 @@ class JourneyDriverListForm():
 
             "created_at",
             "updated_at",
-            
+
             'average_capacity_sold',
         ]
         if average_capacity_sold is not None:
@@ -332,7 +332,8 @@ class JourneyDriverJourneysForm():
         )
 
         for journeydriver in list:
-            journeydriver['seats'] = json.loads(journeydriver['seats'])
+            if journeydriver['seats']:
+                journeydriver['seats'] = json.loads(journeydriver['seats'])
 
         journeysdrivers['list'] = list
 
