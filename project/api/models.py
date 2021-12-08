@@ -397,18 +397,32 @@ class JourneyDriverManager(models.Manager):
                 states=RawSQL(
                     """
                         (
-                            SELECT 
-                                (
-                                    CASE
-                                        WHEN ((COUNT(*)::NUMERIC(10,2) / 10)::NUMERIC(10,2) * 100) >= %s THEN 1
-                                        ELSE 0
-                                    END
-                                ) AS "states"
-                            FROM 
-                                api_ticket AS ticket
-                            WHERE 
-                                ticket.journey_driver_id = api_journeydriver.id
-                            GROUP BY ticket.journey_driver_id
+                            CASE
+                                WHEN (
+                                    (
+                                        (
+                                            (
+                                                SELECT 
+                                                    COUNT(*)
+                                                FROM 
+                                                    api_ticket AS ticket
+                                                WHERE 
+                                                    ticket.journey_driver_id = api_journeydriver.id
+                                                GROUP BY ticket.journey_driver_id
+                                            )::NUMERIC(10,2)
+                                            /
+                                            (
+                                                SELECT
+                                                    COUNT(*)
+                                                FROM "api_seat" seat
+                                                WHERE seat."is_active" = true
+                                            )::NUMERIC(10,2)
+                                        )::NUMERIC(10,2)
+                                        * 100
+                                    )::NUMERIC(10,2)
+                                ) >= %s THEN 1
+                                ELSE 0
+                            END
                         )
                     """,
                     (average_capacity_sold,)
@@ -547,12 +561,25 @@ class JourneyDriverManager(models.Manager):
             average_capacity_sold=RawSQL(
                 """
                     (
-                        SELECT 
-                            (COUNT(*)::NUMERIC(10,2) / 10)::NUMERIC(10,2) * 100
-                        FROM 
-                            api_ticket AS ticket
-                        WHERE 
-                            ticket.journey_driver_id = api_journeydriver.id
+                        (
+                            (
+                                SELECT 
+                                    COUNT(*)
+                                FROM 
+                                    api_ticket AS ticket
+                                WHERE 
+                                    ticket.journey_driver_id = api_journeydriver.id
+                                GROUP BY ticket.journey_driver_id
+                            )::NUMERIC(10,2)
+                            /
+                            (
+                                SELECT
+                                    COUNT(*)
+                                FROM "api_seat" seat
+                                WHERE seat."is_active" = true
+                            )::NUMERIC(10,2)
+                        )::NUMERIC(10,2)
+                        * 100
                     )::NUMERIC(10,2)
                 """,
                 ()
