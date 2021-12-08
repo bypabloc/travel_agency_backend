@@ -38,7 +38,15 @@ class BusManager(models.Manager):
                             "api_driver"."bus_id" = "api_bus"."id"
                         GROUP BY
                             "api_driver"."bus_id"
-                    ) / 10 > %s
+                    )
+                    / 
+                    (
+                        SELECT
+                            COUNT(*)
+                        FROM "api_seat" seat
+                        WHERE seat."is_active" = true
+                    )
+                    > %s
                     ''',
                 ],
                 params = [
@@ -58,7 +66,14 @@ class BusManager(models.Manager):
                                 "api_driver"."bus_id" = "api_bus"."id"
                             GROUP BY
                                 "api_driver"."bus_id"
-                        ) / 10
+                        )
+                        /
+                        (
+                            SELECT
+                                COUNT(*)
+                            FROM "api_seat" seat
+                            WHERE seat."is_active" = true
+                        )
                     """,
                     ()
                 )
