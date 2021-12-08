@@ -397,18 +397,32 @@ class JourneyDriverManager(models.Manager):
                 states=RawSQL(
                     """
                         (
-                            SELECT 
-                                (
-                                    CASE
-                                        WHEN ((COUNT(*)::NUMERIC(10,2) / 10)::NUMERIC(10,2) * 100) >= %s THEN 1
-                                        ELSE 0
-                                    END
-                                ) AS "states"
-                            FROM 
-                                api_ticket AS ticket
-                            WHERE 
-                                ticket.journey_driver_id = api_journeydriver.id
-                            GROUP BY ticket.journey_driver_id
+                            CASE
+                                WHEN (
+                                    (
+                                        (
+                                            (
+                                                SELECT 
+                                                    COUNT(*)
+                                                FROM 
+                                                    api_ticket AS ticket
+                                                WHERE 
+                                                    ticket.journey_driver_id = api_journeydriver.id
+                                                GROUP BY ticket.journey_driver_id
+                                            )::NUMERIC(10,2)
+                                            /
+                                            (
+                                                SELECT
+                                                    COUNT(*)
+                                                FROM "api_seat" seat
+                                                WHERE seat."is_active" = true
+                                            )::NUMERIC(10,2)
+                                        )::NUMERIC(10,2)
+                                        * 100
+                                    )::NUMERIC(10,2)
+                                ) >= %s THEN 1
+                                ELSE 0
+                            END
                         )
                     """,
                     (average_capacity_sold,)
@@ -547,12 +561,25 @@ class JourneyDriverManager(models.Manager):
             average_capacity_sold=RawSQL(
                 """
                     (
-                        SELECT 
-                            (COUNT(*)::NUMERIC(10,2) / 10)::NUMERIC(10,2) * 100
-                        FROM 
-                            api_ticket AS ticket
-                        WHERE 
-                            ticket.journey_driver_id = api_journeydriver.id
+                        (
+                            (
+                                SELECT 
+                                    COUNT(*)
+                                FROM 
+                                    api_ticket AS ticket
+                                WHERE 
+                                    ticket.journey_driver_id = api_journeydriver.id
+                                GROUP BY ticket.journey_driver_id
+                            )::NUMERIC(10,2)
+                            /
+                            (
+                                SELECT
+                                    COUNT(*)
+                                FROM "api_seat" seat
+                                WHERE seat."is_active" = true
+                            )::NUMERIC(10,2)
+                        )::NUMERIC(10,2)
+                        * 100
                     )::NUMERIC(10,2)
                 """,
                 ()
@@ -638,221 +665,223 @@ def pre_save(sender, instance, **kwargs):
 
 @receiver(pre_migrate)
 def pre_migrate(sender, **kwargs):
-    print('\n\n')
-    print('pre_migrate')
-    print('\n\n')
+    pass
+    # print('\n\n')
+    # print('pre_migrate')
+    # print('\n\n')
 
-    try:
-        Bus.objects.all().delete()
-        Driver.objects.all().delete()
-        Location.objects.all().delete()
-        Journey.objects.all().delete()
-        Passenger.objects.all().delete()
-        Seat.objects.all().delete()
-        JourneyDriver.objects.all().delete()
-    except Exception as e:
-        pass
+    # try:
+    #     Bus.objects.all().delete()
+    #     Driver.objects.all().delete()
+    #     Location.objects.all().delete()
+    #     Journey.objects.all().delete()
+    #     Passenger.objects.all().delete()
+    #     Seat.objects.all().delete()
+    #     JourneyDriver.objects.all().delete()
+    # except Exception as e:
+    #     pass
 
 @receiver(post_migrate)
 def post_migrate(sender, plan, **kwargs):
-    print('post_migrate')
+    pass
+    # print('post_migrate')
 
-    try:
-        Bus.objects.create(
-            plate = 'X-123',
-            color = '#000000',
-            brand = 'Toyota',
-            model = 'Corolla',
-            serial = '123456789',
-            year = '2021',
-            is_active = True,
-        )
-    except Exception as e:
-        print('Bus -> Exception ',e)
-        pass
+    # try:
+    #     Bus.objects.create(
+    #         plate = 'X-123',
+    #         color = '#000000',
+    #         brand = 'Toyota',
+    #         model = 'Corolla',
+    #         serial = '123456789',
+    #         year = '2021',
+    #         is_active = True,
+    #     )
+    # except Exception as e:
+    #     print('Bus -> Exception ',e)
+    #     pass
 
-    try:
-        buses_random = random_objects(model=Bus.objects)
+    # try:
+    #     buses_random = random_objects(model=Bus.objects)
 
-        Driver.objects.create(
-            document = '123456789',
-            names = 'Juan',
-            lastname = 'Perez',
-            date_of_birth = '2000-01-01',
-            is_active = True,
-            bus = buses_random['one'],
-        )
-    except Exception as e:
-        print('Driver -> Exception ',e)
-        pass
+    #     Driver.objects.create(
+    #         document = '123456789',
+    #         names = 'Juan',
+    #         lastname = 'Perez',
+    #         date_of_birth = '2000-01-01',
+    #         is_active = True,
+    #         bus = buses_random['one'],
+    #     )
+    # except Exception as e:
+    #     print('Driver -> Exception ',e)
+    #     pass
 
-    try:
-        Location.objects.create(
-            name = 'Cali',
-            is_active = True,
-        )
-        Location.objects.create(
-            name = 'Bogota',
-            is_active = True,
-        )
-        Location.objects.create(
-            name = 'Medellin',
-            is_active = True,
-        )
-        Location.objects.create(
-            name = 'Cartagena',
-            is_active = True,
-        )
-        Location.objects.create(
-            name = 'Barranquilla',
-            is_active = True,
-        )
-        Location.objects.create(
-            name = 'Cucuta',
-            is_active = True,
-        )
-        Location.objects.create(
-            name = 'Bucaramanga',
-            is_active = True,
-        )
-        Location.objects.create(
-            name = 'Manizales',
-            is_active = True,
-        )
-        Location.objects.create(
-            name = 'Villavicencio',
-            is_active = True,
-        )
-        Location.objects.create(
-            name = 'Pasto',
-            is_active = True,
-        )
-        Location.objects.create(
-            name = 'Monteria',
-            is_active = True,
-        )
-        Location.objects.create(
-            name = 'Neiva',
-            is_active = True,
-        )
-        Location.objects.create(
-            name = 'Armenia',
-            is_active = True,
-        )
-        Location.objects.create(
-            name = 'Pereira',
-            is_active = True,
-        )
+    # try:
+    #     Location.objects.create(
+    #         name = 'Cali',
+    #         is_active = True,
+    #     )
+    #     Location.objects.create(
+    #         name = 'Bogota',
+    #         is_active = True,
+    #     )
+    #     Location.objects.create(
+    #         name = 'Medellin',
+    #         is_active = True,
+    #     )
+    #     Location.objects.create(
+    #         name = 'Cartagena',
+    #         is_active = True,
+    #     )
+    #     Location.objects.create(
+    #         name = 'Barranquilla',
+    #         is_active = True,
+    #     )
+    #     Location.objects.create(
+    #         name = 'Cucuta',
+    #         is_active = True,
+    #     )
+    #     Location.objects.create(
+    #         name = 'Bucaramanga',
+    #         is_active = True,
+    #     )
+    #     Location.objects.create(
+    #         name = 'Manizales',
+    #         is_active = True,
+    #     )
+    #     Location.objects.create(
+    #         name = 'Villavicencio',
+    #         is_active = True,
+    #     )
+    #     Location.objects.create(
+    #         name = 'Pasto',
+    #         is_active = True,
+    #     )
+    #     Location.objects.create(
+    #         name = 'Monteria',
+    #         is_active = True,
+    #     )
+    #     Location.objects.create(
+    #         name = 'Neiva',
+    #         is_active = True,
+    #     )
+    #     Location.objects.create(
+    #         name = 'Armenia',
+    #         is_active = True,
+    #     )
+    #     Location.objects.create(
+    #         name = 'Pereira',
+    #         is_active = True,
+    #     )
 
-    except Exception as e:
-        print('Location -> Exception ',e)
-        pass
+    # except Exception as e:
+    #     print('Location -> Exception ',e)
+    #     pass
 
-    try:
-        locations_random = random_objects(model=Location.objects)
+    # try:
+    #     locations_random = random_objects(model=Location.objects)
 
-        Journey.objects.create(
-            duration_in_seconds = random.randint(3600, (3600*24)),
-            location_origin = locations_random['many'][0],
-            location_destination = locations_random['many'][1],
-            is_active = True,
-        )
-    except Exception as e:
-        print('Journey -> Exception ',e)
-        pass
+    #     Journey.objects.create(
+    #         duration_in_seconds = random.randint(3600, (3600*24)),
+    #         location_origin = locations_random['many'][0],
+    #         location_destination = locations_random['many'][1],
+    #         is_active = True,
+    #     )
+    # except Exception as e:
+    #     print('Journey -> Exception ',e)
+    #     pass
 
-    try:
-        Seat.objects.create(
-            seat_x=1,
-            seat_y='A'
-        )
-        Seat.objects.create(
-            seat_x=1,
-            seat_y='B'
-        )
-        Seat.objects.create(
-            seat_x=2,
-            seat_y='B'
-        )
-        Seat.objects.create(
-            seat_x=3,
-            seat_y='B'
-        )
-        Seat.objects.create(
-            seat_x=1,
-            seat_y='C'
-        )
-        Seat.objects.create(
-            seat_x=2,
-            seat_y='C'
-        )
-        Seat.objects.create(
-            seat_x=3,
-            seat_y='C'
-        )
-        Seat.objects.create(
-            seat_x=1,
-            seat_y='D'
-        )
-        Seat.objects.create(
-            seat_x=2,
-            seat_y='D'
-        )
-        Seat.objects.create(
-            seat_x=3,
-            seat_y='D'
-        )
-    except Exception as e:
-        print('Seat -> Exception ',e)
-        pass
+    # try:
+    #     Seat.objects.create(
+    #         seat_x=1,
+    #         seat_y='A'
+    #     )
+    #     Seat.objects.create(
+    #         seat_x=1,
+    #         seat_y='B'
+    #     )
+    #     Seat.objects.create(
+    #         seat_x=2,
+    #         seat_y='B'
+    #     )
+    #     Seat.objects.create(
+    #         seat_x=3,
+    #         seat_y='B'
+    #     )
+    #     Seat.objects.create(
+    #         seat_x=1,
+    #         seat_y='C'
+    #     )
+    #     Seat.objects.create(
+    #         seat_x=2,
+    #         seat_y='C'
+    #     )
+    #     Seat.objects.create(
+    #         seat_x=3,
+    #         seat_y='C'
+    #     )
+    #     Seat.objects.create(
+    #         seat_x=1,
+    #         seat_y='D'
+    #     )
+    #     Seat.objects.create(
+    #         seat_x=2,
+    #         seat_y='D'
+    #     )
+    #     Seat.objects.create(
+    #         seat_x=3,
+    #         seat_y='D'
+    #     )
+    # except Exception as e:
+    #     print('Seat -> Exception ',e)
+    #     pass
 
-    try:
-        Passenger.objects.create(
-            document = '123456789',
-            names = 'Carlos',
-            lastname = 'Acosta',
-            date_of_birth = '2002-01-01',
-            is_whitelist = True,
-        )
-        Passenger.objects.create(
-            document = '223456789',
-            names = 'Luis',
-            lastname = 'Mendoza',
-            date_of_birth = '2005-01-01',
-            is_whitelist = True,
-        )
-    except Exception as e:
-        print('Passenger -> Exception ',e)
-        pass
+    # try:
+    #     Passenger.objects.create(
+    #         document = '123456789',
+    #         names = 'Carlos',
+    #         lastname = 'Acosta',
+    #         date_of_birth = '2002-01-01',
+    #         is_whitelist = True,
+    #     )
+    #     Passenger.objects.create(
+    #         document = '223456789',
+    #         names = 'Luis',
+    #         lastname = 'Mendoza',
+    #         date_of_birth = '2005-01-01',
+    #         is_whitelist = True,
+    #     )
+    # except Exception as e:
+    #     print('Passenger -> Exception ',e)
+    #     pass
 
-    try:
-        journey = random_objects(model=Journey.objects)
-        driver = random_objects(model=Driver.objects)
+    # try:
+    #     journey = random_objects(model=Journey.objects)
+    #     driver = random_objects(model=Driver.objects)
 
-        JourneyDriver.objects.create(
-            datetime_start = gen_datetime(),
-            journey = journey['one'],
-            driver = driver['one'],
-            states = random.randint(1,5),
-        )
+    #     JourneyDriver.objects.create(
+    #         datetime_start = gen_datetime(),
+    #         journey = journey['one'],
+    #         driver = driver['one'],
+    #         states = random.randint(1,5),
+    #     )
 
-        JourneyDriver.objects.create(
-            datetime_start = gen_datetime(),
-            journey = journey['one'],
-            driver = driver['one'],
-            states = random.randint(1,5),
-        )
+    #     JourneyDriver.objects.create(
+    #         datetime_start = gen_datetime(),
+    #         journey = journey['one'],
+    #         driver = driver['one'],
+    #         states = random.randint(1,5),
+    #     )
 
-        JourneyDriver.objects.create(
-            datetime_start = gen_datetime(),
-            journey = journey['one'],
-            driver = driver['one'],
-            states = random.randint(1,5),
-        )
+    #     JourneyDriver.objects.create(
+    #         datetime_start = gen_datetime(),
+    #         journey = journey['one'],
+    #         driver = driver['one'],
+    #         states = random.randint(1,5),
+    #     )
         
-    except Exception as e:
-        print('JourneyDriver -> Exception ',e)
-        pass
+    # except Exception as e:
+    #     print('JourneyDriver -> Exception ',e)
+    #     pass
 
 def random_objects(model):
     items = list(model.all())
