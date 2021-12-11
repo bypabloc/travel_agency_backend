@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,12 +23,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('PYTHON_SECRET_KEY')
+SECRET_KEY = os.environ.get('PYTHON_SECRET_KEY')
+print('\n')
+print('\n')
+print('-----------------------------------------------------')
+print('SECRET_KEY: ', SECRET_KEY)
+print('-----------------------------------------------------')
+# SECRET_KEY = os.environ.get("ENV_DEBUG")
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('ENV_DEBUG')
+DEBUG = os.environ.get('ENV_DEBUG')
+print('-----------------------------------------------------')
+print('DEBUG: ', DEBUG)
+print('-----------------------------------------------------')
+# DEBUG = int(os.environ.get("PYTHON_SECRET_KEY", default=0))
 
-ALLOWED_HOSTS = []
-
+# 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
+# For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
+# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+print('-----------------------------------------------------')
+print('ALLOWED_HOSTS: ', ALLOWED_HOSTS)
+print('-----------------------------------------------------')
 
 # Application definition
 
@@ -106,14 +122,18 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE'),
-        'HOST': os.getenv('DB_HOST'),
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'PORT': os.getenv('DB_PORT'),
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
+
+print('-----------------------------------------------------')
+print('DATABASES: ', DATABASES)
+print('-----------------------------------------------------')
 
 
 # Password validation

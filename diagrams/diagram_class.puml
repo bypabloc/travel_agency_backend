@@ -1,0 +1,223 @@
+
+@startuml travel_agency_backend
+
+class Bus{
+    -{field} id : BigInteger << pk, generated, unique >>
+    +{field} plate : String << unique >>
+    +{field} color : String
+    +{field} brand : String
+    +{field} model : String
+    +{field} serial : String << unique >>
+    +{field} year : SmallInteger
+    +{field} is_active : Boolean 
+    -{field} created_at : Datetime 
+    -{field} updated_at : Datetime 
+    __
+
+    +{method} create()
+    +{method} findOne(
+        int id
+    )
+    +{method} state_change()
+    +{method} list(
+        int page
+        int per_page
+        String sort_by
+        String sort
+        String filter_by
+        String filter
+        int more_than_percentage_of_capacity_sold
+    )
+}
+
+class Driver{
+    -{field} id : BigInteger << pk, generated, unique >>
+    +{field} document : String << unique >>
+    +{field} names : String
+    +{field} lastname : String
+    +{field} date_of_birth : Datetime
+    +{field} is_active : Boolean
+    -{field} created_at : Datetime 
+    -{field} updated_at : Datetime 
+    ..
+    +{field} bus_id : BigInteger << fk >>
+    __
+
+    +{method} create()
+    +{method} update()
+    +{method} state_change()
+    +{method} findOne(
+        int id
+    )
+    +{method} list(
+        int page
+        int per_page
+        String sort_by
+        String sort
+        String filter_by
+        String filter
+    )
+}
+Driver::bus_id <-- Bus::id
+
+class Passenger{
+    -{field} id : BigInteger << pk, generated, unique >>
+    +{field} document : String << unique >>
+    +{field} names : String
+    +{field} lastname : String
+    +{field} date_of_birth : Datetime 
+    +{field} is_whitelist : Boolean 
+    -{field} created_at : Datetime 
+    -{field} updated_at : Datetime 
+    __
+
+    +{method} create()
+    +{method} whitelist_change()
+    +{method} findOne(
+        int id
+    )
+    +{method} list(
+        int page
+        int per_page
+        String sort_by
+        String sort
+        String filter_by
+        String filter
+    )
+}
+
+class Location{
+    -{field} id : BigInteger << pk, generated, unique >>
+    +{field} name : String << unique >>
+    +{field} is_active : Boolean
+    -{field} created_at : Datetime 
+    -{field} updated_at : Datetime 
+    __
+
+    +{method} create()
+    +{method} update()
+    +{method} state_change()
+    +{method} findOne(
+        int id
+    )
+    +{method} list(
+        int page
+        int per_page
+        String sort_by
+        String sort
+        String filter_by
+        String filter
+    )
+}
+class Journey{
+    -{field} id : BigInteger << pk, generated, unique >>
+    +{field} duration_in_seconds : Integer
+    +{field} is_active : Boolean 
+    -{field} created_at : Datetime 
+    -{field} updated_at : Datetime 
+    ..
+    +{field} location_id_origin : BigInteger << fk >>
+    +{field} location_id_destination : BigInteger << fk >>
+    __
+
+    +{method} create()
+    +{method} state_change()
+    +{method} findOne(
+        int id
+    )
+    +{method} list(
+        int page
+        int per_page
+        String sort_by
+        String sort
+        String filter_by
+        String filter
+    )
+}
+Journey::location_id_origin <-- Location::id
+Journey::location_id_destination <-- Location::id
+
+class JourneyDriver{
+    -{field} id : BigInteger << pk, generated, unique >>
+    +{field} datetime_start : Datetime
+    +{field} states : SmallInteger 
+    -{field} created_at : Datetime 
+    -{field} updated_at : Datetime 
+    ..
+    +{field} journey_id : BigInteger << fk >>
+    +{field} driver_id : BigInteger  << fk >>
+    __
+
+    +{method} create()
+    +{method} driver_change()
+    +{method} state_change()
+    +{method} findOne(
+        int id
+    )
+    +{method} list(
+        int page
+        int per_page
+        String sort_by
+        String sort
+        String filter_by
+        String filter
+    )
+}
+JourneyDriver::journey_id <-- Journey::id
+JourneyDriver::driver_id <-- Driver::id
+
+class Seat{
+    -{field} id : BigInteger << pk, generated, unique >>
+    +{field} seat_x : Integer
+    +{field} seat_y : String 
+    +{field} is_active : Boolean 
+    -{field} created_at : Datetime 
+    -{field} updated_at : Datetime 
+    __
+
+    +{method} create()
+    +{method} state_change()
+    +{method} findOne(
+        int id
+    )
+    +{method} list(
+        int page
+        int per_page
+        String sort_by
+        String sort
+        String filter_by
+        String filter
+    )
+}
+
+class Ticket{
+    -{field} id : BigInteger << pk, generated, unique >>
+    +{field} states : SmallInteger
+    -{field} created_at : Datetime 
+    -{field} updated_at : Datetime 
+    ..
+    +{field} passenger_id : BigInteger << fk >>
+    +{field} journey_driver_id : BigInteger << fk >>
+    +{field} seat_id : BigInteger << fk >>
+    __
+
+    +{method} create()
+    +{method} seat_change()
+    +{method} state_change()
+    +{method} findOne(
+        int id
+    )
+    +{method} list(
+        int page
+        int per_page
+        String sort_by
+        String sort
+        String filter_by
+        String filter
+    )
+}
+Ticket::passenger_id <-- Passenger::id
+Ticket::journey_driver_id <-- JourneyDriver::id
+Ticket::seat_id <-- Seat::id
+
+@enduml

@@ -14,15 +14,18 @@ Luego puede proseguir con los comandos de instalación.
     pip install pipenv
 
 ## Comandos para arrancar el proyecto
-
     pipenv install
     pipenv shell
     python manage.py migrate
     python manage.py runserver
+
+    sudo docker-compose build --no-cache
+    sudo docker-compose up -d --build web
 
 ## Si el puerto esta ocupado, se puede usar el comando para liberarlo:
     lsof -t -i tcp:8000 | xargs kill -9
 
 ## Database structure
 
+# docker-compose logs -f
 ![Diagram class](/diagrams/diagram_class.svg)

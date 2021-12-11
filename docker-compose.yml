@@ -1,0 +1,55 @@
+version: '3.7'
+
+volumes:
+  postgres_data:
+
+networks:
+  travel_agency:
+    driver: bridge
+  
+services:
+
+  web:
+    build: ./
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./:/usr/src/
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env
+    depends_on:
+      - travel_agency_db
+    links:
+      - travel_agency_db
+    networks:
+      - travel_agency
+
+  travel_agency_db:
+    image: postgres:13.0-alpine
+    restart: 'always'
+    container_name: travel_agency_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5434"
+    networks:
+      - travel_agency
+
+  # sudo docker-compose build --no-cache
+  # sudo docker-compose up -d --build
+  # docker-compose up -d --build --remove-orphans
+  # sudo docker-compose down
+
+  # lsof -t -i tcp:5434 | xargs kill -9
+
+  # sudo docker-compose exec travel_agency_db psql --username=postgres --dbname=postgres
+
+  # docker-compose down
+  # docker rm -f $(docker ps -a -q)
+  # docker rmi -f $(docker images -aq)
+  # docker volume rm $(docker volume ls -q)
