@@ -41,15 +41,13 @@ services:
       - travel_agency
 
   # sudo docker-compose build --no-cache
-  # sudo docker-compose up -d --build
-  # docker-compose up -d --build --remove-orphans
-  # sudo docker-compose down
+  # sudo docker-compose up -d --build --remove-orphans
 
   # lsof -t -i tcp:5434 | xargs kill -9
-
-  # sudo docker-compose exec travel_agency_db psql --username=postgres --dbname=postgres
 
   # docker-compose down
   # docker rm -f $(docker ps -a -q)
   # docker rmi -f $(docker images -aq)
   # docker volume rm $(docker volume ls -q)
+
+  # sudo docker-compose exec travel_agency_db psql --username=postgres --dbname=postgres
