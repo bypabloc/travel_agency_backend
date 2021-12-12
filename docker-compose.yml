@@ -11,7 +11,9 @@ services:
 
   web:
     build: ./
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./:/usr/src/
     ports:
@@ -32,22 +34,10 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: "${SQL_DATABASE}"
+      POSTGRES_USER: "${SQL_USER}"
+      POSTGRES_PASSWORD: "${SQL_PASSWORD}"
     ports:
-      - "5434:5434"
+      - "5434:${SQL_PORT}"
     networks:
       - travel_agency
-
-  # sudo docker-compose build --no-cache
-  # sudo docker-compose up -d --build --remove-orphans
-
-  # lsof -t -i tcp:5434 | xargs kill -9
-
-  # docker-compose down
-  # docker rm -f $(docker ps -a -q)
-  # docker rmi -f $(docker images -aq)
-  # docker volume rm $(docker volume ls -q)
-
-  # sudo docker-compose exec travel_agency_db psql --username=postgres --dbname=postgres
