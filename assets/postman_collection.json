@@ -1,0 +1,1491 @@
+{
+	"info": {
+		"_postman_id": "2b002e73-78bf-46d3-af58-4f86f9a63b2b",
+		"name": "travel_agency_backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "bus",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "plate",
+									"value": "11111",
+									"type": "text"
+								},
+								{
+									"key": "color",
+									"value": "000000",
+									"type": "text"
+								},
+								{
+									"key": "brand",
+									"value": "asd11",
+									"type": "text"
+								},
+								{
+									"key": "model",
+									"value": "asd",
+									"type": "text"
+								},
+								{
+									"key": "serial",
+									"value": "111111",
+									"type": "text"
+								},
+								{
+									"key": "year",
+									"value": "2021",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/bus/create",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"bus",
+								"create"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "asd",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "state_change",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "active",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/bus/state_change",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"bus",
+								"state_change"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/bus/list?per_page=10&page=1",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"bus",
+								"list"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "sort",
+									"value": "desc",
+									"disabled": true
+								},
+								{
+									"key": "sort_by",
+									"value": "created_at",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "2021-12-01 22:49:12",
+									"disabled": true
+								},
+								{
+									"key": "filter_by",
+									"value": "created_at",
+									"disabled": true
+								},
+								{
+									"key": "more_than_percentage_of_capacity_sold",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "journey",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "OxyQQlNhiY",
+									"disabled": true
+								},
+								{
+									"key": "unique_in_drivers",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/bus/find_one?id=1",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"bus",
+								"find_one"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "location",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "1111",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/location/create",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"location",
+								"create"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "asd",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "state_change",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "active",
+									"value": "0",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/location/state_change",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"location",
+								"state_change"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/location/list?sort=desc&sort_by=created_at&search=&available=1",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"location",
+								"list"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "desc"
+								},
+								{
+									"key": "sort_by",
+									"value": "created_at"
+								},
+								{
+									"key": "filter",
+									"value": "2021-12-01 22:49:12",
+									"disabled": true
+								},
+								{
+									"key": "filter_by",
+									"value": "created_at",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "available",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/location/find_one?id=1",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"location",
+								"find_one"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "driver",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "document",
+									"value": "3333",
+									"type": "text"
+								},
+								{
+									"key": "names",
+									"value": "pablo",
+									"type": "text"
+								},
+								{
+									"key": "lastname",
+									"value": "contreras",
+									"type": "text"
+								},
+								{
+									"key": "date_of_birth",
+									"value": "1991-08-08",
+									"type": "text"
+								},
+								{
+									"key": "bus",
+									"value": "262",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/driver/create",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"driver",
+								"create"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "asd",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "state_change",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id",
+									"value": "24",
+									"type": "text"
+								},
+								{
+									"key": "active",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/driver/state_change",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"driver",
+								"state_change"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Driver list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/driver/list?sort=desc&sort_by=created_at&tz_in_minutes=300&search=Perez",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"driver",
+								"list"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "desc"
+								},
+								{
+									"key": "sort_by",
+									"value": "created_at"
+								},
+								{
+									"key": "filter",
+									"value": "2021-12-01 18:53:51",
+									"disabled": true
+								},
+								{
+									"key": "filter_by",
+									"value": "created_at",
+									"disabled": true
+								},
+								{
+									"key": "tz_in_minutes",
+									"value": "300"
+								},
+								{
+									"key": "search",
+									"value": "Perez"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/driver/find_one?id=217",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"driver",
+								"find_one"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "217"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "passenger",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "document",
+									"value": "123",
+									"type": "text"
+								},
+								{
+									"key": "names",
+									"value": "pablo",
+									"type": "text"
+								},
+								{
+									"key": "lastname",
+									"value": "contreras",
+									"type": "text"
+								},
+								{
+									"key": "date_of_birth",
+									"value": "1991-08-08",
+									"type": "text"
+								},
+								{
+									"key": "bus",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/passenger/create",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"passenger",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "state_change",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id",
+									"value": "4",
+									"type": "text"
+								},
+								{
+									"key": "active",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/passenger/state_change",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"passenger",
+								"state_change"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "passenger list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/passenger/list?sort=desc&sort_by=created_at&tz_in_minutes=300",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"passenger",
+								"list"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "desc"
+								},
+								{
+									"key": "sort_by",
+									"value": "created_at"
+								},
+								{
+									"key": "filter",
+									"value": "2021-12-01 18:53:51",
+									"disabled": true
+								},
+								{
+									"key": "filter_by",
+									"value": "created_at",
+									"disabled": true
+								},
+								{
+									"key": "tz_in_minutes",
+									"value": "300"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/passenger/find_one?id=4",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"passenger",
+								"find_one"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "seat",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "seat_x",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "seat_y",
+									"value": "e",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/seat/create",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"seat",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "state_change",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id",
+									"value": "72",
+									"type": "text"
+								},
+								{
+									"key": "active",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/seat/state_change",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"seat",
+								"state_change"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "seat list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/seat/list?per_page=10000&sort=desc&sort_by=created_at&filter_by=is_active&tz_in_minutes=300",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"seat",
+								"list"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "10000"
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "desc"
+								},
+								{
+									"key": "sort_by",
+									"value": "created_at"
+								},
+								{
+									"key": "filter",
+									"value": "f",
+									"disabled": true
+								},
+								{
+									"key": "filter_by",
+									"value": "is_active"
+								},
+								{
+									"key": "tz_in_minutes",
+									"value": "300"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "seat list_availability",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/seat/list_availability?journey_driver=179",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"seat",
+								"list_availability"
+							],
+							"query": [
+								{
+									"key": "journey_driver",
+									"value": "179"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/seat/find_one?id=2",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"seat",
+								"find_one"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "journey",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "duration_in_seconds",
+									"value": "3333",
+									"type": "text"
+								},
+								{
+									"key": "location_origin",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "location_destination",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/journey/create",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"journey",
+								"create"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "asd",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "state_change",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id",
+									"value": "4",
+									"type": "text"
+								},
+								{
+									"key": "active",
+									"value": "0",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/journey/state_change",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"journey",
+								"state_change"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/journey/list?sort=desc&sort_by=created_at&filter=8&filter_by=id&tz_in_minutes=300",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"journey",
+								"list"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "desc"
+								},
+								{
+									"key": "sort_by",
+									"value": "created_at"
+								},
+								{
+									"key": "filter",
+									"value": "8"
+								},
+								{
+									"key": "filter_by",
+									"value": "id"
+								},
+								{
+									"key": "tz_in_minutes",
+									"value": "300"
+								},
+								{
+									"key": "search",
+									"value": "asd",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/journey/find_one?id=4",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"journey",
+								"find_one"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "journey_driver",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "datetime_start",
+									"value": "2021-12-12 01:00",
+									"type": "text"
+								},
+								{
+									"key": "journey",
+									"value": "198",
+									"type": "text"
+								},
+								{
+									"key": "driver",
+									"value": "217",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/journey_driver/create?tz_in_minutes=300",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"journey_driver",
+								"create"
+							],
+							"query": [
+								{
+									"key": "tz_in_minutes",
+									"value": "300"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "state_change",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id",
+									"value": "178",
+									"type": "text"
+								},
+								{
+									"key": "states",
+									"value": "3",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/journey_driver/state_change",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"journey_driver",
+								"state_change"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "driver_change",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id",
+									"value": "178",
+									"type": "text"
+								},
+								{
+									"key": "driver",
+									"value": "222",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/journey_driver/driver_change",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"journey_driver",
+								"driver_change"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "journey_driver Journeys",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/journey_driver/journeys?sort=desc&sort_by=created_at&tz_in_minutes=300&location_origin=4&location_destination=3&date_start=2021-12-07&date_end=2021-12-17&average_capacity_sold=1",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"journey_driver",
+								"journeys"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "desc"
+								},
+								{
+									"key": "sort_by",
+									"value": "created_at"
+								},
+								{
+									"key": "filter",
+									"value": "2021-12-01 18:53:51",
+									"disabled": true
+								},
+								{
+									"key": "filter_by",
+									"value": "created_at",
+									"disabled": true
+								},
+								{
+									"key": "tz_in_minutes",
+									"value": "300"
+								},
+								{
+									"key": "location_origin",
+									"value": "4"
+								},
+								{
+									"key": "location_destination",
+									"value": "3"
+								},
+								{
+									"key": "date_start",
+									"value": "2021-12-07"
+								},
+								{
+									"key": "date_end",
+									"value": "2021-12-17"
+								},
+								{
+									"key": "average_capacity_sold",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "journey_driver list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/journey_driver/list?sort=desc&sort_by=created_at&tz_in_minutes=300&search=&average_capacity_sold=60",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"journey_driver",
+								"list"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "desc"
+								},
+								{
+									"key": "sort_by",
+									"value": "created_at"
+								},
+								{
+									"key": "filter",
+									"value": "8",
+									"disabled": true
+								},
+								{
+									"key": "filter_by",
+									"value": "id",
+									"disabled": true
+								},
+								{
+									"key": "tz_in_minutes",
+									"value": "300"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "average_capacity_sold",
+									"value": "60"
+								},
+								{
+									"key": "bus",
+									"value": "8",
+									"disabled": true
+								},
+								{
+									"key": "journey",
+									"value": "11",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/journey_driver/find_one?id=178",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"journey_driver",
+								"find_one"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "178"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ticket",
+			"item": [
+				{
+					"name": "ticket create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "passenger",
+									"value": "213",
+									"type": "text"
+								},
+								{
+									"key": "journey_driver",
+									"value": "179",
+									"type": "text"
+								},
+								{
+									"key": "seat",
+									"value": "1897",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/ticket/create?tz_in_minutes=300",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"ticket",
+								"create"
+							],
+							"query": [
+								{
+									"key": "tz_in_minutes",
+									"value": "300"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "state_change",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "states",
+									"value": "3",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/ticket/state_change",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"ticket",
+								"state_change"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ticket seat_change",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id",
+									"value": "7",
+									"type": "text"
+								},
+								{
+									"key": "seat",
+									"value": "1896",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/ticket/seat_change",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"ticket",
+								"seat_change"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ticket list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/ticket/list?sort=desc&sort_by=created_at&tz_in_minutes=300",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"ticket",
+								"list"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "desc"
+								},
+								{
+									"key": "sort_by",
+									"value": "created_at"
+								},
+								{
+									"key": "filter",
+									"value": "2021-12-01 18:53:51",
+									"disabled": true
+								},
+								{
+									"key": "filter_by",
+									"value": "created_at",
+									"disabled": true
+								},
+								{
+									"key": "tz_in_minutes",
+									"value": "300"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findOne",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{travel_agency_backend_url}}/ticket/find_one?id=2",
+							"host": [
+								"{{travel_agency_backend_url}}"
+							],
+							"path": [
+								"ticket",
+								"find_one"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
