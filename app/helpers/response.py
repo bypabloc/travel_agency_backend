@@ -28,7 +28,6 @@ def sendUnprocessableEntity(errors = []):
         return sendInternalServerError(ex)
 
 def sendInternalServerError(ex):
-    print('sendInternalServerError -> ex',ex)
     trace = []
     tb = ex.__traceback__
     while tb is not None:
@@ -44,5 +43,11 @@ def sendInternalServerError(ex):
         'message': 'No hay datos',
         'trace': trace,
     }
+    for trace in trace:
+        print('sendInternalServerError -> ex',ex)
+        print('sendInternalServerError -> ex -> trace -> filename',trace['filename'])
+        print('sendInternalServerError -> ex -> trace -> name',trace['name'])
+        print('sendInternalServerError -> ex -> trace -> lineno',trace['lineno'])
+        print('\n')
 
     return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
