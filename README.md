@@ -30,7 +30,7 @@ Luego puede proseguir con los comandos de instalación.
     lsof -t -i tcp:8000 | xargs kill -9
 
 ## Postman Collection
-![Archivo .json](/assets/postman_collection.json)
+[Archivo .json](/assets/postman_collection.json)
 
 ## Database structure
 ![Diagram class](/assets/diagrams/diagram_class.svg)
