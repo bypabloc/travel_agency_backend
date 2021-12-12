@@ -18,6 +18,9 @@ Luego puede proseguir con los comandos de instalación.
 
 ## Nota, comandos docker: 
 
+### Comandos para ver el log de un contenedor:
+    sudo docker-compose logs -t -f web
+
 ### Comandos para bajar todos los contenedores:
     sudo docker-compose down
 

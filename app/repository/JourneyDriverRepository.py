@@ -103,6 +103,9 @@ class JourneyDriverCreateForm(forms.Form):
             if datetime.now() > datetime_start_with_tz:
                 self.add_error('datetime_start', 'Cannot be in the past')
             else:
+                print('journey.id', journey.id)
+                print('driver.id', driver.id)
+                
                 journeys_drivers = JourneyDriver.objects.filter(
                     journey=journey.id,
                     driver=driver.id,
